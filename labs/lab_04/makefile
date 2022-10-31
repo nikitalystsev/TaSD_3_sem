@@ -7,7 +7,6 @@ CFLAGS := -std=c99 -Wall -Werror -Wpedantic -Wextra -Wfloat-equal -Wfloat-conver
 PREF_SRC := ./src/
 PREF_INC := ./inc/
 PREF_OUT := ./out/
-PREF_DATA := ./data/
 
 SRC := $(wildcard $(PREF_SRC)*.c)
 OUT_OBJ := $(patsubst $(PREF_SRC)%.c, $(PREF_OUT)%.o, $(SRC))
