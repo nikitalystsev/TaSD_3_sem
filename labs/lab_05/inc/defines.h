@@ -21,4 +21,6 @@
 #define TURQ "\033[0;36m" // бирюзовый
 #define WHITE "\033[0;37m"
 
+#define ERR_ALLOC_MEM 100
+
 #endif

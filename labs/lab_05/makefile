@@ -12,6 +12,10 @@ PREF_OUT := ./out/
 SRC := $(wildcard $(PREF_SRC)*.c)
 OUT_OBJ := $(patsubst $(PREF_SRC)%.c, $(PREF_OUT)%.o, $(SRC))
 
+run : app.exe
+	valgrind --track-origins=yes --leak-check=full \
+	--show-leak-kinds=all -q ./app.exe 
+
 app.exe : $(OUT_OBJ)
 	$(CC) $(OUT_OBJ) -o app.exe 
 
