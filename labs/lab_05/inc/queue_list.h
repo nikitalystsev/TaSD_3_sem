@@ -18,17 +18,13 @@ typedef struct list_elem_t list_elem_t;
 typedef struct list_t list_t;
 typedef struct queue_list_t queue_list_t;
 
-// /// @brief элемент очереди - заявка
+/// @brief элемент очереди - заявка
 struct list_elem_t
 {
-    double arrival_time; // время прихода
-    double process_time; // время обработки
+    double arrival_time;    // время прихода
+    double processing_time; // время обработки
+    int8_t count_iter;      // количество обработок
 };
-
-// struct list_elem_t
-// {
-//     int8_t number;
-// };
 
 /// @brief односвязный список, содержащий данные
 struct list_t
@@ -41,14 +37,14 @@ struct list_t
 struct queue_list_t
 {
     list_t *queue_list; // очередь в виде списка
-    int32_t size;       // количество злементов в списке
+    int16_t size;       // количество злементов в списке
 };
 
 list_t *create_node(list_elem_t data);
 
 list_t *push_back(list_t *head, list_t *node);
 
-list_t *pop_front(list_t *head);
+list_t *pop_front(list_t *head, list_elem_t *list_elem);
 
 void free_node(list_t *node);
 

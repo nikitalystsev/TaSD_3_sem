@@ -3,6 +3,6 @@
 
 #include "defines.h"
 
-double gen_double_number(double min, double max);
+double random_double(double min, double max);
 
 #endif

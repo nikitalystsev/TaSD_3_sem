@@ -3,7 +3,10 @@ $(shell mkdir -p out)
 CC := gcc
 
 CFLAGS := -std=c99 -Wall -Werror -Wpedantic -Wextra \
-	-Wfloat-equal -Wfloat-conversion -Wvla -O1 -g3 -Iinc -lm 
+	-Wfloat-equal -Wfloat-conversion -Wvla -O1 -g3 -Iinc -lm  
+
+VALGRIND := valgrind --track-origins=yes --leak-check=full \
+	--show-leak-kinds=all -q
 
 PREF_SRC := ./src/
 PREF_INC := ./inc/
@@ -13,8 +16,7 @@ SRC := $(wildcard $(PREF_SRC)*.c)
 OUT_OBJ := $(patsubst $(PREF_SRC)%.c, $(PREF_OUT)%.o, $(SRC))
 
 run : app.exe
-	valgrind --track-origins=yes --leak-check=full \
-	--show-leak-kinds=all -q ./app.exe 
+	$(VALGRIND) ./app.exe 
 
 app.exe : $(OUT_OBJ)
 	$(CC) $(OUT_OBJ) -o app.exe 

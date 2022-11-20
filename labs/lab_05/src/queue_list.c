@@ -30,7 +30,7 @@ list_t *push_back(list_t *head, list_t *node)
     return head;
 }
 
-list_t *pop_front(list_t *head)
+list_t *pop_front(list_t *head, list_elem_t *list_elem)
 {
     if (!head)
     {
@@ -39,6 +39,7 @@ list_t *pop_front(list_t *head)
         return NULL;
     }
 
+    *list_elem = head->data;
     list_t *tmp_head = head->next;
 
     free(head);
@@ -64,9 +65,9 @@ void free_list(list_t *head)
 
 void print_node(list_t *node)
 {
-    printf("[+] data: %lf, %lf\n",
-           node->data.arrival_time,
-           node->data.process_time);
+    printf("[+] count iter: %d\n", node->data.count_iter);
+    printf("[+] arrival time: %lf\n", node->data.arrival_time);
+    printf("[+] processing time: %lf\n", node->data.processing_time);
 }
 
 void print_list(list_t *head)

@@ -21,6 +21,14 @@
 #define TURQ "\033[0;36m" // бирюзовый
 #define WHITE "\033[0;37m"
 
+#define COUNT_PROCESS 5
+#define MIN_TIME_ADD 0
+#define MAX_TIME_ADD 6
+#define MIN_TIME_PROCESSING 0
+#define MAX_TIME_PROCESSING 1
+#define COUNT_APPLICATION 1000
+#define COUNT_PRINT_APPLICATION 100
+
 #define ERR_ALLOC_MEM 100
 
 #endif
