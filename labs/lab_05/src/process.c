@@ -24,17 +24,23 @@ static void fill_default_data_modeling(data_modeling_t *const data_modeling)
     data_modeling->time_output_all_application = 0;
 }
 
-static void default_new_application(arr_elem_t *const arr_elem, const parametres_t *const parametres)
+static void default_new_application_arr(arr_elem_t *const arr_elem,
+                                        const parametres_t *const parametres)
 {
-    arr_elem->arrival_time = random_double(parametres->min_time_add, parametres->max_time_add);
-    arr_elem->processing_time = random_double(parametres->min_time_processing, parametres->max_time_processing);
+    arr_elem->arrival_time = random_double(parametres->min_time_add,
+                                           parametres->max_time_add);
+    arr_elem->processing_time = random_double(parametres->min_time_processing,
+                                              parametres->max_time_processing);
     arr_elem->count_iter = 0;
 }
 
-static void default_new_application_list(list_elem_t *const list_elem, const parametres_t *const parametres)
+static void default_new_application_list(list_elem_t *const list_elem,
+                                         const parametres_t *const parametres)
 {
-    list_elem->arrival_time = random_double(parametres->min_time_add, parametres->max_time_add);
-    list_elem->processing_time = random_double(parametres->min_time_processing, parametres->max_time_processing);
+    list_elem->arrival_time = random_double(parametres->min_time_add,
+                                            parametres->max_time_add);
+    list_elem->processing_time = random_double(parametres->min_time_processing,
+                                               parametres->max_time_processing);
     list_elem->count_iter = 0;
 }
 
@@ -66,7 +72,8 @@ int modeling_process_arr(const parametres_t *const parametres)
     int count_len_queue_between_print = 0;
     double sum_curr_len = 0;
 
-    while (data_modeling.total_output_application < parametres->count_application)
+    while (data_modeling.total_output_application <
+           parametres->count_application)
     {
         if (!service_machine)
         {
@@ -74,12 +81,14 @@ int modeling_process_arr(const parametres_t *const parametres)
             if (queue.p_in == -1)
             {
                 /* если в очереди нет элементов */
-                default_new_application(&new_elem, parametres);
+                default_new_application_arr(&new_elem, parametres);
                 push_back_queue_array(&queue, &new_elem);
                 data_modeling.total_input_application++;
                 data_modeling.total_simulation_time += new_elem.arrival_time;
-                data_modeling.time_input_all_application += new_elem.arrival_time;
-                data_modeling.time_output_all_application += new_elem.processing_time;
+                data_modeling.time_input_all_application +=
+                    new_elem.arrival_time;
+                data_modeling.time_output_all_application +=
+                    new_elem.processing_time;
             }
             else
             {
@@ -96,7 +105,8 @@ int modeling_process_arr(const parametres_t *const parametres)
             {
                 /*
                 если заявка обработается раньше,
-                чем другая заявка придет в очередь, то аппарат заканчивает работу
+                чем другая заявка придет в очередь,
+                то аппарат заканчивает работу
                 */
                 new_elem.arrival_time -= temp_elem.processing_time;
                 service_machine = false;
@@ -106,9 +116,11 @@ int modeling_process_arr(const parametres_t *const parametres)
                 {
                     /*
                     если из аппарата вышла заявка,
-                    которая проходила очередь меньше 5 раз, добавляем ее обратно
+                    которая проходила очередь меньше 5 раз,
+                    добавляем ее обратно
                     */
-                    data_modeling.time_output_all_application += temp_elem.processing_time;
+                    data_modeling.time_output_all_application +=
+                        temp_elem.processing_time;
                     push_back_queue_array(&queue, &temp_elem);
                     data_modeling.total_input_application++;
                 }
@@ -124,10 +136,12 @@ int modeling_process_arr(const parametres_t *const parametres)
                 если заявка обработается позже,
                 чем другая заявка придет в очередь, то добавляем другую заявку
                 */
-                default_new_application(&new_elem, parametres);
+                default_new_application_arr(&new_elem, parametres);
                 // new_elem.processing_time -= temp_elem.arrival_time;
-                data_modeling.time_input_all_application += new_elem.arrival_time;
-                data_modeling.time_output_all_application += new_elem.processing_time;
+                data_modeling.time_input_all_application +=
+                    new_elem.arrival_time;
+                data_modeling.time_output_all_application +=
+                    new_elem.processing_time;
                 push_back_queue_array(&queue, &new_elem);
                 data_modeling.total_simulation_time += new_elem.arrival_time;
                 data_modeling.total_input_application++;
@@ -139,7 +153,8 @@ int modeling_process_arr(const parametres_t *const parametres)
 
         if (data_modeling.total_output_application == i)
         {
-            data_modeling.average_length_queue = sum_curr_len / count_len_queue_between_print;
+            data_modeling.average_length_queue =
+                sum_curr_len / count_len_queue_between_print;
             data_modeling.current_length_queue = queue.p_in - queue.p_out + 1;
             print_intermediate(&data_modeling);
             sum_curr_len = 0;
@@ -148,7 +163,8 @@ int modeling_process_arr(const parametres_t *const parametres)
         }
     }
 
-    data_modeling.downtime_machine = data_modeling.time_input_all_application - data_modeling.time_output_all_application;
+    data_modeling.downtime_machine = data_modeling.time_input_all_application -
+                                     data_modeling.time_output_all_application;
 
     print_result(&data_modeling, parametres);
 
@@ -180,7 +196,8 @@ int modeling_process_list(const parametres_t *const parametres)
     int count_len_queue_between_print = 0;
     double sum_curr_len = 0;
 
-    while (data_modeling.total_output_application < parametres->count_application)
+    while (data_modeling.total_output_application <
+           parametres->count_application)
     {
         if (!service_machine)
         {
@@ -190,17 +207,26 @@ int modeling_process_list(const parametres_t *const parametres)
                 /* если в очереди нет элементов */
                 default_new_application_list(&new_elem, parametres);
                 list_t *node = create_node(new_elem);
-                queue.queue_list = push_back(queue.queue_list, node);
+                if (!node)
+                {
+                    rc = ERR_ALLOC_MEM;
+                    goto free;
+                }
+                queue.queue_list =
+                    push_back_queue_list(queue.queue_list, node);
                 queue.size++;
                 data_modeling.total_input_application++;
                 data_modeling.total_simulation_time += new_elem.arrival_time;
-                data_modeling.time_input_all_application += new_elem.arrival_time;
-                data_modeling.time_output_all_application += new_elem.processing_time;
+                data_modeling.time_input_all_application +=
+                    new_elem.arrival_time;
+                data_modeling.time_output_all_application +=
+                    new_elem.processing_time;
             }
             else
             {
                 /* если в очереди есть элементы */
-                queue.queue_list = pop_front(queue.queue_list, &temp_elem);
+                queue.queue_list =
+                    pop_front_queue_list(queue.queue_list, &temp_elem);
                 queue.size--;
                 service_machine = true;
                 data_modeling.count_calls_machine++;
@@ -213,7 +239,8 @@ int modeling_process_list(const parametres_t *const parametres)
             {
                 /*
                 если заявка обработается раньше,
-                чем другая заявка придет в очередь, то аппарат заканчивает работу
+                чем другая заявка придет в очередь,
+                то аппарат заканчивает работу
                 */
                 new_elem.arrival_time -= temp_elem.processing_time;
                 service_machine = false;
@@ -223,11 +250,19 @@ int modeling_process_list(const parametres_t *const parametres)
                 {
                     /*
                     если из аппарата вышла заявка,
-                    которая проходила очередь меньше 5 раз, добавляем ее обратно
+                    которая проходила очередь меньше 5 раз,
+                    добавляем ее обратно
                     */
-                    data_modeling.time_output_all_application += temp_elem.processing_time;
+                    data_modeling.time_output_all_application +=
+                        temp_elem.processing_time;
                     list_t *node = create_node(temp_elem);
-                    queue.queue_list = push_back(queue.queue_list, node);
+                    if (!node)
+                    {
+                        rc = ERR_ALLOC_MEM;
+                        goto free;
+                    }
+                    queue.queue_list =
+                        push_back_queue_list(queue.queue_list, node);
                     queue.size++;
                     data_modeling.total_input_application++;
                 }
@@ -245,10 +280,18 @@ int modeling_process_list(const parametres_t *const parametres)
                 */
                 default_new_application_list(&new_elem, parametres);
                 // new_elem.processing_time -= temp_elem.arrival_time;
-                data_modeling.time_input_all_application += new_elem.arrival_time;
-                data_modeling.time_output_all_application += new_elem.processing_time;
+                data_modeling.time_input_all_application +=
+                    new_elem.arrival_time;
+                data_modeling.time_output_all_application +=
+                    new_elem.processing_time;
                 list_t *node = create_node(new_elem);
-                queue.queue_list = push_back(queue.queue_list, node);
+                if (!node)
+                {
+                    rc = ERR_ALLOC_MEM;
+                    goto free;
+                }
+                queue.queue_list =
+                    push_back_queue_list(queue.queue_list, node);
                 queue.size++;
                 data_modeling.total_simulation_time += new_elem.arrival_time;
                 data_modeling.total_input_application++;
@@ -260,7 +303,8 @@ int modeling_process_list(const parametres_t *const parametres)
 
         if (data_modeling.total_output_application == i)
         {
-            data_modeling.average_length_queue = sum_curr_len / count_len_queue_between_print;
+            data_modeling.average_length_queue =
+                sum_curr_len / count_len_queue_between_print;
             data_modeling.current_length_queue = queue.size;
             print_intermediate(&data_modeling);
             sum_curr_len = 0;
@@ -269,10 +313,12 @@ int modeling_process_list(const parametres_t *const parametres)
         }
     }
 
-    data_modeling.downtime_machine = data_modeling.time_input_all_application - data_modeling.time_output_all_application;
+    data_modeling.downtime_machine = data_modeling.time_input_all_application -
+                                     data_modeling.time_output_all_application;
 
     print_result(&data_modeling, parametres);
 
+free:
     free_list(queue.queue_list);
 
     return rc;

@@ -42,9 +42,9 @@ struct queue_list_t
 
 list_t *create_node(list_elem_t data);
 
-list_t *push_back(list_t *head, list_t *node);
+list_t *push_back_queue_list(list_t *head, list_t *node);
 
-list_t *pop_front(list_t *head, list_elem_t *list_elem);
+list_t *pop_front_queue_list(list_t *head, list_elem_t *list_elem);
 
 void free_node(list_t *node);
 
@@ -52,6 +52,6 @@ void free_list(list_t *head);
 
 void print_node(list_t *node);
 
-void print_list(list_t *head);
+void print_queue_list(list_t *head);
 
 #endif

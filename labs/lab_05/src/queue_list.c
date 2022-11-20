@@ -13,7 +13,7 @@ list_t *create_node(list_elem_t data)
     return node;
 }
 
-list_t *push_back(list_t *head, list_t *node)
+list_t *push_back_queue_list(list_t *head, list_t *node)
 {
     list_t *tmp_head = head;
 
@@ -30,7 +30,7 @@ list_t *push_back(list_t *head, list_t *node)
     return head;
 }
 
-list_t *pop_front(list_t *head, list_elem_t *list_elem)
+list_t *pop_front_queue_list(list_t *head, list_elem_t *list_elem)
 {
     if (!head)
     {
@@ -70,7 +70,7 @@ void print_node(list_t *node)
     printf("[+] processing time: %lf\n", node->data.processing_time);
 }
 
-void print_list(list_t *head)
+void print_queue_list(list_t *head)
 {
     list_t *tmp_head = head;
 

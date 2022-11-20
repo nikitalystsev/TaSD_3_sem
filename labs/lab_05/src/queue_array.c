@@ -65,7 +65,9 @@ void print_queue_array(queue_array_t *queue_array)
     for (int8_t i = queue_array->p_out; i <= queue_array->p_in; i++)
     {
         printf("[+] count iter: %d\n", queue_array->queue_array[i].count_iter);
-        printf("[+] arrival time: %lf\n", queue_array->queue_array[i].arrival_time);
-        printf("[+] processing time: %lf\n", queue_array->queue_array[i].processing_time);
+        printf("[+] arrival time: %lf\n",
+               queue_array->queue_array[i].arrival_time);
+        printf("[+] processing time: %lf\n",
+               queue_array->queue_array[i].processing_time);
     }
 }
