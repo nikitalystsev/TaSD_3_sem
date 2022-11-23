@@ -8,10 +8,22 @@ int main(void)
 {
     int rc = 0;
 
-    parametres_t param;
-    fill_default_parametres(&param);
+    int work;
 
-    rc = modeling_process_list(&param);
+    if ((rc = read_work_num(&work)) != 0)
+        return rc;
+
+
+    if (!work)
+    {
+        if ((rc = do_modeling()) != 0)
+            return rc;
+    }
+    else
+    {
+        if ((rc = do_action()) != 0)
+            return rc;
+    }
 
     return rc;
 }

@@ -5,8 +5,12 @@
 #include "queue_array.h"
 #include "process.h"
 
-void print_intermediate(const data_modeling_t *const data_modeling);
+void print_task_menu(const param_t *const param);
 
-void print_result(const data_modeling_t *const data_modeling, const parametres_t *const parametres);
+void print_menu(void);
+
+void print_intermediate(const model_t *const model);
+
+void print_result(const model_t *const model, const param_t *const param);
 
 #endif

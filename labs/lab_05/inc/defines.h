@@ -23,12 +23,32 @@
 
 #define COUNT_PROCESS 5
 #define MIN_TIME_ADD 0
-#define MAX_TIME_ADD 6
+#define MAX_TIME_ADD 1
 #define MIN_TIME_PROCESSING 0
 #define MAX_TIME_PROCESSING 1
 #define COUNT_APPLICATION 1000
 #define COUNT_PRINT_APPLICATION 100
+#define MAX_FREE_ADDR_SIZE 10000
 
 #define ERR_ALLOC_MEM 100
+#define ERR_READ_WORK 101
+#define ERR_WORK 103
+#define ERR_READ_ITEM 104
+#define ERR_ITEM 105
+#define ERR_READ_TIME 106
+#define ERR_TIME 107
+#define ERR_READ_SIZE 108
+#define ERR_SIZE 109
+#define ERR_QUEUE_ELEM 110
+#define MAX_SIZE_QUEUE 10000
+
+typedef struct elem_t elem_t;
+
+struct elem_t
+{
+    double add_time;
+    double process_time;
+    int count_iter;
+};
 
 #endif

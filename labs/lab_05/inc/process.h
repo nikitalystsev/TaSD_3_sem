@@ -6,36 +6,42 @@
 #include "queue_list.h"
 #include "gen_number.h"
 
-typedef struct parametres_t parametres_t;
-typedef struct data_modeling_t data_modeling_t;
+typedef struct param_t param_t;
+typedef struct model_t model_t;
 
-struct parametres_t
+struct param_t
 {
-    double min_time_add;
-    double max_time_add;
-    double min_time_processing;
-    double max_time_processing;
-    int16_t count_application;
-    int8_t count_print_application;
+    double min_add_time;
+    double max_add_time;
+    double min_process_time;
+    double max_process_time;
+    int count_appl;
+    int count_print_appl;
 };
 
-struct data_modeling_t
+struct model_t
 {
-    int16_t current_length_queue;
-    double average_length_queue;
-    double total_simulation_time;
-    double time_input_all_application;
-    double time_output_all_application;
-    double downtime_machine;
-    int16_t total_input_application;
-    int16_t total_output_application;
-    int16_t count_calls_machine;
+    int curr_len_queue;
+    double av_len_queue;
+    double model_time;
+    double input_time;
+    double output_time;
+    double downtime;
+    int count_input;
+    int count_output;
+    int count_calls_machine;
 };
 
-void fill_default_parametres(parametres_t *const parametres);
+void fill_default_param(param_t *const param);
 
-int modeling_process_arr(const parametres_t *const parametres);
+int model_arr(const param_t *const param);
 
-int modeling_process_list(const parametres_t *const parametres);
+int model_list(const param_t *const param);
+
+int read_work_num(int *const number);
+
+int do_modeling(void);
+
+int do_action(void);
 
 #endif

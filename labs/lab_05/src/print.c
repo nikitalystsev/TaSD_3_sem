@@ -1,43 +1,94 @@
 #include "print.h"
 
-void print_intermediate(const data_modeling_t *const data_modeling)
+void print_task_menu(const param_t *const param)
+{
+    printf(TURQ "\n--------------------------------------------------------|\n");
+    printf("Параметры обработки и добавления по умолчанию:\n");
+    printf("Добавление: от 0 до 6 е.в.\n");
+    printf("Обработка:  от 0 до 1 е.в.\n");
+    printf("Текущие параметры обработки и добавления:\n");
+    printf("Добавление: от %10.6lf до %10.6lf е.в.\n",
+           param->min_add_time, param->max_add_time);
+    printf("Обработка:  от %10.6lf до %10.6lf е.в.\n",
+           param->min_process_time, param->max_process_time);
+    printf("1 - Изменить время обработки;\n");
+    printf("2 - Изменить время добавления;\n");
+    printf("3 - Cмоделировать СМО, используя очередь в виде списка;\n");
+    printf("4 - Cмоделировать СМО, используя очередь в виде массива;\n");
+    printf("0 - Выйти из программы.\n");
+    printf("--------------------------------------------------------|\n");
+    printf("\nВыберите пункт меню:\n" RESET);
+}
+
+void print_menu(void)
+{
+    printf(
+        TURQ "\n----------------------------------------------------------|\n"
+             "Очередь реализована двумя способами:\n"
+             "а) массивом;\n"
+             "б) списком.\n"
+
+             "\nОперации с очередью в виде массива:\n"
+             "1  - создать очередь;\n"
+             "2  - добавить элемент в очередь;\n"
+             "3  - удалить элемент из очереди;\n"
+             "4  - вывести текущее состояние очереди;\n"
+             "5  - очистить очередь;\n"
+
+             "\nОперации с очередью в виде односвязного линейного списка:\n"
+             "6  - создать очередь;\n"
+             "7  - добавить элемент в очередь;\n"
+             "8  - удалить элемент из очереди;\n"
+             "9  - вывести текущее состояние очереди;\n"
+             "10 - очистить очередь;\n"
+             "11 - вывести массив ранее освобожденных адресов;\n"
+             "12 - вывести сравнение времен работы различных функции\n"
+             "     для работы с очередью\n"
+             "13 - вывести сравнение представления по памяти\n"
+             "     очереди как списка и очереди как массива\n"
+             "\n0  - выйти из программы.\n"
+             "\n----------------------------------------------------------|\n"
+             "Выберите пункт меню:\n" RESET);
+}
+
+void print_intermediate(const model_t *const model)
 {
     printf(GREEN "\n\n|--------------------------------------------|------------|\n");
-    printf("│    Количество вышедших заявок заявок       │ %10d │\n", data_modeling->total_output_application);
+    printf("│    Количество вышедших заявок заявок       │ %10d │\n", model->count_output);
     printf("|--------------------------------------------|------------|\n");
-    printf("│          Текушая длина очереди             │ %10d |\n", data_modeling->current_length_queue);
+    printf("│          Текушая длина очереди             │ %10d |\n", model->curr_len_queue);
     printf("|--------------------------------------------|------------|\n");
-    printf("│          Средняя длина очереди             │  %9.6lf │\n", data_modeling->average_length_queue);
+    printf("│          Средняя длина очереди             │  %9.6lf │\n", model->av_len_queue);
     printf("|--------------------------------------------|------------|\n" RESET);
 }
 
-void print_result(const data_modeling_t *const data_modeling, const parametres_t *const parametres)
+void print_result(const model_t *const model, const param_t *const param)
 {
-    double theoretic_total_simulation_time = ((parametres->max_time_add - parametres->min_time_add) / 2) * parametres->count_application;
-    double theoretic_time_input_all_application = ((parametres->max_time_add - parametres->min_time_add) / 2) * parametres->count_application;
-    double theoretic_time_output_all_application = ((parametres->max_time_processing - parametres->min_time_processing) / 2) * parametres->count_application * COUNT_PROCESS;
-    double theoretic_downtime_machine = theoretic_time_input_all_application - theoretic_time_output_all_application;
-    int16_t theoretic_count_calls_machine = parametres->count_application * COUNT_PROCESS;
+    double theor_input_time = ((param->max_add_time - param->min_add_time) / 2) * param->count_appl;
+    double theor_output_time = ((param->max_process_time - param->min_process_time) / 2) * param->count_appl * COUNT_PROCESS;
+    double theor_model_time = (theor_input_time > theor_output_time) ? theor_input_time : theor_output_time;
+    double theor_downtime = theor_input_time - theor_output_time;
+    int16_t theor_count_calls_machine = param->count_appl * COUNT_PROCESS;
 
-    double fault_input = (100 * abs(data_modeling->total_input_application - parametres->count_application * COUNT_PROCESS)) / (parametres->count_application * COUNT_PROCESS);
-    double fault_output = (100 * fabs(data_modeling->total_simulation_time - theoretic_total_simulation_time)) / theoretic_total_simulation_time;
+    double fault_input = (100 * fabs(model->input_time - theor_input_time)) / (theor_input_time);
+    double fault_output = (100 * fabs(model->output_time - theor_output_time)) / theor_output_time;
 
     printf(YELLOW "\n|-------------------------------------|--------------------|--------------------|\n");
     printf("│             Название                │    Практические    │    Теоретические   │\n");
     printf("|-------------------------------------|--------------------|--------------------|\n");
-    printf("│     Общее время моделирования       │ %13.6lf е.в. │ %10.0lf е.в.    │\n", data_modeling->total_simulation_time, theoretic_total_simulation_time);
+    printf("│     Общее время моделирования       │ %13.6lf е.в. │ %10.0lf е.в.    │\n", model->model_time, theor_model_time);
     printf("|-------------------------------------|--------------------|--------------------|\n");
-    printf("│   Общее время добавления заявок     │ %13.6lf е.в. │ %10.0lf е.в.    │\n", data_modeling->time_input_all_application, theoretic_time_input_all_application);
+    printf("│   Общее время добавления заявок     │ %13.6lf е.в. │ %10.0lf е.в.    │\n", model->input_time, theor_input_time);
     printf("|-------------------------------------|--------------------|--------------------|\n");
-    printf("│   Общее время обработки заявок      │ %13.6lf е.в. │ %10.0lf е.в.    │\n", data_modeling->time_output_all_application, theoretic_time_output_all_application);
+    printf("│   Общее время обработки заявок      │ %13.6lf е.в. │ %10.0lf е.в.    │\n", model->output_time, theor_output_time);
     printf("|-------------------------------------|--------------------|--------------------|\n");
-    printf("│         Время простоя ОА            │ %13.6lf е.в. │ %10.0lf е.в.    │\n", data_modeling->downtime_machine, theoretic_downtime_machine);
+    printf("│         Время простоя ОА            │ %13.6lf е.в. │ %10.0lf е.в.    │\n", model->downtime, theor_downtime);
     printf("|-------------------------------------|--------------------|--------------------|\n");
-    printf("│      Количество срабатываний        │ %10d е.в.    │ %5d +- 5 е.в.    │\n", data_modeling->count_calls_machine, theoretic_count_calls_machine);
+    printf("│      Количество срабатываний        │ %10d е.в.    │ %5d +- 5 е.в.    │\n", model->count_calls_machine, theor_count_calls_machine);
     printf("|-------------------------------------|--------------------|--------------------|\n");
-    printf("│     Количество вошедших заявок      │             %10d                  │\n", data_modeling->total_input_application);
+    printf("│     Количество вошедших заявок      │             %10d                  │\n", model->count_input);
     printf("|-------------------------------------|--------------------|--------------------|\n");
-    printf("│     Количество вышедших заявок      │             %10d                  │\n", data_modeling->total_output_application);
+    printf("│     Количество вышедших заявок      │             %10d                  │\n", model->count_output);
     printf("|-------------------------------------|--------------------|--------------------|\n");
     printf("│                  Расчет погрешности                      │     Результат      │\n");
     printf("|----------------------------------------------------------|--------------------|\n");
@@ -48,3 +99,8 @@ void print_result(const data_modeling_t *const data_modeling, const parametres_t
     printf("│  100 * |Практ. время модел-я - Теорит. | / Теорет.       │ %10.6lf процент │\n", fault_output);
     printf("|----------------------------------------------------------|--------------------|\n" RESET);
 }
+
+// void print_func_measure(void)
+// {
+
+// }
