@@ -2,8 +2,7 @@
 #define __PRINT_H__
 
 #include "defines.h"
-#include "queue_array.h"
-#include "process.h"
+#include "modeling.h"
 
 void print_task_menu(const param_t *const param);
 

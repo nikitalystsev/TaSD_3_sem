@@ -1,8 +1,8 @@
 #include "defines.h"
 #include "queue_array.h"
-#include "gen_number.h"
 #include "queue_list.h"
 #include "process.h"
+#include "modeling.h"
 
 int main(void)
 {
