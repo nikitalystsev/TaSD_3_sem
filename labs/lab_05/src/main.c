@@ -9,10 +9,7 @@ int main(void)
 {
     int rc = 0;
 
-    rc = print_add_queue_time();
-    rc += print_pop_queue_time();
-    rc += print_clean_queue_time();
-    rc += print_create_queue_time();
+    print_func_time();
 
     // int work;
 

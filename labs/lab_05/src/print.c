@@ -146,6 +146,7 @@ int print_size_info(void)
             int size_list = queue_list_size_in_bytes(&queue_list);
 
             printf("|      %10d      |         %10d          |           %10d           |\n", i, size_list, size_arr);
+            printf("|-------------------------------------------------------------------------------------|\n");
         }
 
         push_back_queue_array(&queue_arr, &data);
@@ -155,7 +156,7 @@ int print_size_info(void)
         queue_list.size++;
     }
 
-    printf("|-------------------------------------------------------------------------------------|\n" RESET);
+    printf(RESET);
 
 free:
     free_list(queue_list.queue_list);
@@ -180,7 +181,7 @@ int print_add_queue_time(void)
         goto free;
 
     printf(YELLOW "\n|-----------------------------------------------------------|\n");
-    printf("│                      │         Добавление элемента        │\n");
+    printf("│                      │     Добавление элемента (мкс)      │\n");
     printf("| Количество элементов |------------------------------------|\n");
     printf("│                      │      Список     │      Массив      │\n");
     printf("|-----------------------------------------------------------|\n");
@@ -203,12 +204,18 @@ int print_add_queue_time(void)
         queue_list.size++;
 
         if (i == 10)
+        {
             printf("|      %10d      |   %13.6Lf |    %13.6Lf |\n", i, end2, end);
+            printf("|-----------------------------------------------------------|\n");
+        }
         if (i % 100 == 0 && i != 0)
+        {
             printf("|      %10d      |   %13.6Lf |    %13.6Lf |\n", i, end2, end);
+            printf("|-----------------------------------------------------------|\n");
+        }
     }
 
-    printf("|-----------------------------------------------------------|\n" RESET);
+    printf(RESET);
 
 free:
     free_list(queue_list.queue_list);
@@ -233,7 +240,7 @@ int print_pop_queue_time(void)
         goto free;
 
     printf(YELLOW "\n|-----------------------------------------------------------|\n");
-    printf("│                      │          Удаление элемента         │\n");
+    printf("│                      │      Удаление элемента (мкс)       │\n");
     printf("| Количество элементов |------------------------------------|\n");
     printf("│                      │      Список     │      Массив      │\n");
     printf("|-----------------------------------------------------------|\n");
@@ -264,12 +271,18 @@ int print_pop_queue_time(void)
         queue_list.size--;
 
         if (i == 10)
+        {
             printf("|      %10d      |   %13.6Lf |    %13.6Lf |\n", i, end2, end);
+            printf("|-----------------------------------------------------------|\n");
+        }
         if (i % 100 == 0 && i != 0)
+        {
             printf("|      %10d      |   %13.6Lf |    %13.6Lf |\n", i, end2, end);
+            printf("|-----------------------------------------------------------|\n");
+        }
     }
 
-    printf("|-----------------------------------------------------------|\n" RESET);
+    printf(RESET);
 
 free:
     free_list(queue_list.queue_list);
@@ -286,7 +299,7 @@ int print_clean_queue_time(void)
     queue_list_t queue_list;
 
     printf(YELLOW "\n|-----------------------------------------------------------|\n");
-    printf("│                      │           Очистка очереди          │\n");
+    printf("│                      │       Очистка очереди (мкс)        │\n");
     printf("| Количество элементов |------------------------------------|\n");
     printf("│                      │      Список     │      Массив      │\n");
     printf("|-----------------------------------------------------------|\n");
@@ -323,9 +336,15 @@ int print_clean_queue_time(void)
         long double end2 = microseconds_now() - beg;
 
         if (count == 10)
+        {
             printf("|      %10d      |   %13.6Lf |    %13.6Lf |\n", count, end2, end);
+            printf("|-----------------------------------------------------------|\n");
+        }
         if (count % 100 == 0 && j != 0)
+        {
             printf("|      %10d      |   %13.6Lf |    %13.6Lf |\n", count, end2, end);
+            printf("|-----------------------------------------------------------|\n");
+        }
 
         if (j == 0)
             count = 100;
@@ -333,7 +352,7 @@ int print_clean_queue_time(void)
             count += 100;
     }
 
-    printf("|-----------------------------------------------------------|\n");
+    printf(RESET);
 
     return rc;
 }
@@ -349,7 +368,7 @@ int print_create_queue_time(void)
     queue_list.size = 0;
 
     printf(YELLOW "\n|-----------------------------------------------------------|\n");
-    printf("│                      Cоздание очереди                     │\n");
+    printf("│                   Cоздание очереди (мкс)                  │\n");
     printf("|-----------------------------------------------------------|\n");
     printf("│          Список          |              Массив            │\n");
     printf("|-----------------------------------------------------------|\n");
@@ -367,10 +386,29 @@ int print_create_queue_time(void)
 
     printf("|   %13.6Lf          |         %13.6Lf          |\n", end2, end);
 
-    printf("|-----------------------------------------------------------|\n");
+    printf("|-----------------------------------------------------------|\n" RESET);
 
     free_list(queue_list.queue_list);
     free(queue_arr.queue_array);
+
+    return rc;
+}
+
+int print_func_time(void)
+{
+    int rc = 0;
+
+    if ((rc = print_add_queue_time()) != 0)
+        return rc;
+
+    if ((rc = print_pop_queue_time()) != 0)
+        return rc;
+
+    if ((rc = print_clean_queue_time()) != 0)
+        return rc;
+
+    if ((rc = print_create_queue_time()) != 0)
+        return rc;
 
     return rc;
 }

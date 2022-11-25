@@ -20,7 +20,8 @@ int print_pop_queue_time(void);
 
 int print_clean_queue_time(void);
 
-
 int print_create_queue_time(void);
+
+int print_func_time(void);
 
 #endif
