@@ -6,16 +6,19 @@ void print_task_menu(const param_t *const param)
     printf("Параметры обработки и добавления по умолчанию:\n");
     printf("Добавление: от 0 до 6 е.в.\n");
     printf("Обработка:  от 0 до 1 е.в.\n");
+
     printf("Текущие параметры обработки и добавления:\n");
     printf("Добавление: от %10.6lf до %10.6lf е.в.\n",
            param->min_add_time, param->max_add_time);
     printf("Обработка:  от %10.6lf до %10.6lf е.в.\n",
            param->min_process_time, param->max_process_time);
+
     printf("1 - Изменить время обработки;\n");
     printf("2 - Изменить время добавления;\n");
     printf("3 - Cмоделировать СМО, используя очередь в виде списка;\n");
     printf("4 - Cмоделировать СМО, используя очередь в виде массива;\n");
-    printf("0 - Выйти из программы.\n");
+    
+    printf("\n0 - Выйти из программы.\n");
     printf("--------------------------------------------------------|\n");
     printf("\nВыберите пункт меню:\n" RESET);
 }
@@ -64,16 +67,16 @@ void print_intermediate(const model_t *const model)
 
 void print_result(const model_t *const model, const param_t *const param)
 {
-    double theor_input_time = ((param->max_add_time - param->min_add_time) / 2) * param->count_appl;
-    double theor_output_time = ((param->max_process_time - param->min_process_time) / 2) * param->count_appl * COUNT_PROCESS;
-    double theor_model_time = (theor_input_time > theor_output_time) ? theor_input_time : theor_output_time;
+    double theor_input_time = ((param->max_add_time + param->min_add_time) / 2) * param->count_appl;
+    double theor_output_time = ((param->max_process_time + param->min_process_time) / 2) * param->count_appl * COUNT_PROCESS;
+    double theor_model_time = max_double(theor_input_time, theor_output_time);
     double theor_downtime = theor_input_time - theor_output_time;
     int16_t theor_count_calls_machine = param->count_appl * COUNT_PROCESS;
 
-    double fault_input = (100 * fabs(model->input_time - theor_input_time)) / (theor_input_time);
+    double fault_input = (100 * fabs(model->input_time - theor_input_time)) / theor_input_time;
     double fault_output = (100 * fabs(model->output_time - theor_output_time)) / theor_output_time;
 
-    printf(YELLOW "\n|-------------------------------------|--------------------|--------------------|\n");
+    printf(YELLOW "\n|-------------------------------------------------------------------------------|\n");
     printf("│             Название                │    Практические    │    Теоретические   │\n");
     printf("|-------------------------------------|--------------------|--------------------|\n");
     printf("│     Общее время моделирования       │ %13.6lf е.в. │ %10.0lf е.в.    │\n", model->model_time, theor_model_time);
@@ -85,11 +88,15 @@ void print_result(const model_t *const model, const param_t *const param)
     printf("│         Время простоя ОА            │ %13.6lf е.в. │ %10.0lf е.в.    │\n", model->downtime, theor_downtime);
     printf("|-------------------------------------|--------------------|--------------------|\n");
     printf("│      Количество срабатываний        │ %10d е.в.    │ %5d +- 5 е.в.    │\n", model->count_calls_machine, theor_count_calls_machine);
-    printf("|-------------------------------------|--------------------|--------------------|\n");
+    printf("|-------------------------------------|-----------------------------------------|\n");
     printf("│     Количество вошедших заявок      │             %10d                  │\n", model->count_input);
-    printf("|-------------------------------------|--------------------|--------------------|\n");
+    printf("|-------------------------------------|-----------------------------------------|\n");
     printf("│     Количество вышедших заявок      │             %10d                  │\n", model->count_output);
-    printf("|-------------------------------------|--------------------|--------------------|\n");
+    printf("|-------------------------------------|-----------------------------------------|\n");
+    printf("│    Время работы программы (мкс)     │               %13.6Lf             │\n", model->work_time);
+    printf("|-------------------------------------|-----------------------------------------|\n");
+    printf("│   Требуемый обьем памяти (байты)    │             %10d                  │\n", model->memory_size);
+    printf("|-------------------------------------------------------------------------------|\n");
     printf("│                  Расчет погрешности                      │     Результат      │\n");
     printf("|----------------------------------------------------------|--------------------|\n");
     printf("│           -------Погрешность по входу--------            │                    │\n");
@@ -97,7 +104,7 @@ void print_result(const model_t *const model, const param_t *const param)
     printf("|----------------------------------------------------------|--------------------|\n");
     printf("│           -------Погрешность по выходу--------           │                    │\n");
     printf("│  100 * |Практ. время модел-я - Теорит. | / Теорет.       │ %10.6lf процент │\n", fault_output);
-    printf("|----------------------------------------------------------|--------------------|\n" RESET);
+    printf("|-------------------------------------------------------------------------------|\n" RESET);
 }
 
 // void print_func_measure(void)

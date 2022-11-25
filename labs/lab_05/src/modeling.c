@@ -22,6 +22,8 @@ static void fill_default_model(model_t *const data)
     data->model_time = 0;
     data->input_time = 0;
     data->output_time = 0;
+    data->work_time = 0;
+    data->memory_size = 0;
 }
 
 static void create_new_appl(elem_t *const elem, const param_t *const param)
@@ -40,7 +42,7 @@ int model_arr(const param_t *const param)
     srand(time(NULL));
 
     queue_array_t queue;
-    queue.size = 300000;
+    queue.size = MAX_SIZE_QUEUE / 10;
 
     if ((rc = create_queue_array(&queue)) != 0)
     {
@@ -65,6 +67,10 @@ int model_arr(const param_t *const param)
 
     int flag = 0;
 
+    int mem_size = 0;
+
+    model.work_time = microseconds_now();
+
     while (model.count_output < param->count_appl)
     {
         // printf("в цикле\n");
@@ -82,6 +88,10 @@ int model_arr(const param_t *const param)
                 }
 
                 push_back_queue_array(&queue, &new_elem);
+
+                mem_size = queue_arr_size_in_bytes(&queue);
+                model.memory_size = max_int(model.memory_size, mem_size);
+
                 flag = 0;
                 model.count_input++;
                 model.input_time += new_elem.add_time;
@@ -127,6 +137,10 @@ int model_arr(const param_t *const param)
                     */
                     model.output_time += temp_elem.process_time;
                     push_back_queue_array(&queue, &temp_elem);
+
+                    mem_size = queue_arr_size_in_bytes(&queue);
+                    model.memory_size = max_int(model.memory_size, mem_size);
+
                     model.count_input++;
                 }
                 else
@@ -139,13 +153,17 @@ int model_arr(const param_t *const param)
             {
                 /*
                 если заявка обработается позже,
-                чем другая заявка придет в очередь, 
+                чем другая заявка придет в очередь,
                 то добавляем другую заявку
                 */
                 temp -= temp2;
                 model.input_time += new_elem.add_time;
                 model.output_time += new_elem.process_time;
                 push_back_queue_array(&queue, &new_elem);
+
+                mem_size = queue_arr_size_in_bytes(&queue);
+                model.memory_size = max_int(model.memory_size, mem_size);
+
                 flag = 0;
                 model.count_input++;
             }
@@ -165,12 +183,11 @@ int model_arr(const param_t *const param)
         }
     }
 
+    model.work_time = microseconds_now() - model.work_time;
+
     model.downtime = model.input_time - model.output_time;
 
-    model.model_time =
-        (model.input_time > model.output_time)
-            ? model.input_time
-            : model.output_time;
+    model.model_time = max_double(model.input_time, model.output_time);
 
     print_result(&model, param);
 
@@ -206,6 +223,10 @@ int model_list(const param_t *const param)
 
     int flag = 0;
 
+    model.work_time = microseconds_now();
+
+    int mem_size = 0;
+
     while (model.count_output < param->count_appl)
     {
         if (!machine)
@@ -227,6 +248,10 @@ int model_list(const param_t *const param)
 
                 queue.queue_list =
                     push_back_queue_list(queue.queue_list, node);
+
+                mem_size = queue_list_size_in_bytes(&queue);
+                model.memory_size = max_int(model.memory_size, mem_size);
+
                 flag = 0;
                 queue.size++;
                 model.count_input++;
@@ -281,6 +306,8 @@ int model_list(const param_t *const param)
 
                     queue.queue_list =
                         push_back_queue_list(queue.queue_list, node);
+                    mem_size = queue_list_size_in_bytes(&queue);
+                    model.memory_size = max_int(model.memory_size, mem_size);
                     queue.size++;
                     model.count_input++;
                 }
@@ -307,6 +334,8 @@ int model_list(const param_t *const param)
 
                 queue.queue_list =
                     push_back_queue_list(queue.queue_list, node);
+                mem_size = queue_list_size_in_bytes(&queue);
+                model.memory_size = max_int(model.memory_size, mem_size);
                 flag = 0;
                 queue.size++;
                 model.count_input++;
@@ -327,12 +356,11 @@ int model_list(const param_t *const param)
         }
     }
 
+    model.work_time = microseconds_now() - model.work_time;
+
     model.downtime = model.input_time - model.output_time;
 
-    model.model_time =
-        (model.input_time > model.output_time)
-            ? model.input_time
-            : model.output_time;
+    model.model_time = max_double(model.input_time, model.output_time);
 
     print_result(&model, param);
 

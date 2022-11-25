@@ -14,4 +14,13 @@ int do_modeling(void);
 
 int do_action(void);
 
+int queue_arr_size_in_bytes(const queue_array_t *const queue);
+
+int queue_list_size_in_bytes(const queue_list_t *const queue);
+
+int max_int(const int a, const int b);
+
+double max_double(const double a, const double b);
+
+
 #endif

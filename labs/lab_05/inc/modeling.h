@@ -5,6 +5,7 @@
 #include "queue_array.h"
 #include "queue_list.h"
 #include "process.h"
+#include "timing.h"
 
 typedef struct param_t param_t;
 typedef struct model_t model_t;
@@ -32,6 +33,8 @@ struct model_t
     int count_input;         // количество вошедших заявок
     int count_output;        // количество вышедних заявок
     int count_calls_machine; // количество вызовов аппарата
+    long double work_time;   // время работы (в микросекундах)
+    int memory_size;         // затраченный обьем памяти
 };
 
 void fill_default_param(param_t *const param);

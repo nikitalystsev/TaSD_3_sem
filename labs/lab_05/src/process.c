@@ -335,3 +335,46 @@ free:
 
     return rc;
 }
+
+int queue_arr_size_in_bytes(const queue_array_t *const queue)
+{
+    int size = 0;
+
+    size += sizeof(queue->size);
+    size += sizeof(queue->p_in);
+    size += sizeof(queue->p_out);
+    size += (sizeof(queue->queue_array[0]) * (queue->p_in - queue->p_out + 1));
+
+    return size;
+}
+
+int queue_list_size_in_bytes(const queue_list_t *const queue)
+{
+    int size = 0;
+
+    size += sizeof(queue->size);
+    size += (sizeof(list_t) * queue->size);
+
+    return size;
+}
+
+int max_int(const int a, const int b)
+{
+    return (a > b) ? a : b;
+}
+
+double max_double(const double a, const double b)
+{
+    if (fabs(a - b) <= EPS)
+    {
+        return a;
+    }
+    else if (a < (b - EPS))
+    {
+        return b;
+    }
+    else
+    {
+        return a;
+    }
+}

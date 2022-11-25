@@ -21,6 +21,7 @@
 #define TURQ "\033[0;36m" // бирюзовый
 #define WHITE "\033[0;37m"
 
+#define EPS 1e-9
 #define COUNT_PROCESS 5
 #define MIN_TIME_ADD 0
 #define MAX_TIME_ADD 6
