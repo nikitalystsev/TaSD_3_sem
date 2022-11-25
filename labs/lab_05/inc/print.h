@@ -12,4 +12,15 @@ void print_intermediate(const model_t *const model);
 
 void print_result(const model_t *const model, const param_t *const param);
 
+int print_size_info(void);
+
+int print_add_queue_time(void);
+
+int print_pop_queue_time(void);
+
+int print_clean_queue_time(void);
+
+
+int print_create_queue_time(void);
+
 #endif

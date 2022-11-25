@@ -13,8 +13,6 @@ int create_queue_array(queue_array_t *const queue)
     queue->p_in = -1;
     queue->p_out = 0;
 
-    printf(GREEN "[+] Очередь как массив была успешно создана!\n" RESET);
-
     return EXIT_SUCCESS;
 }
 

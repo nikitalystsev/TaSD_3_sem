@@ -22,5 +22,4 @@ int max_int(const int a, const int b);
 
 double max_double(const double a, const double b);
 
-
 #endif

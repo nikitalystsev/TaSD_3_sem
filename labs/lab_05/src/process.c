@@ -209,7 +209,13 @@ int do_action(void)
     elem_t arr_elem, list_elem;
 
     free_addr_t free_addr;
-    free_addr.top = -1;
+    free_addr.free_addrs = NULL;
+    free_addr.size = MAX_SIZE_QUEUE;
+
+    if ((rc = create_free_addr(&free_addr)) != 0)
+        return rc;
+    init_free_addrs(&free_addr);
+
     int check_queue_list = 0;
 
     while (true)
@@ -217,7 +223,7 @@ int do_action(void)
         print_menu();
 
         if ((rc = read_menu_item(&menu_item)) != 0)
-            return rc;
+            goto free;
 
         switch (menu_item)
         {
@@ -300,8 +306,9 @@ int do_action(void)
         case 8:
             if (check_queue_list)
             {
-                free_addr.array_free_addr[++free_addr.top] =
+                free_addr.free_addrs[++free_addr.top].addr =
                     (size_t *)queue_list.queue_list;
+
                 if ((queue_list.queue_list = pop_front_queue_list(
                          queue_list.queue_list, &list_elem)) != NULL)
                     puts(GREEN "[+] Элемент был успешно удален "
@@ -332,6 +339,7 @@ int do_action(void)
 free:
     free(queue_array.queue_array);
     free_list(queue_list.queue_list);
+    free(free_addr.free_addrs);
 
     return rc;
 }
@@ -353,6 +361,7 @@ int queue_list_size_in_bytes(const queue_list_t *const queue)
     int size = 0;
 
     size += sizeof(queue->size);
+    size += sizeof(queue->queue_list);
     size += (sizeof(list_t) * queue->size);
 
     return size;

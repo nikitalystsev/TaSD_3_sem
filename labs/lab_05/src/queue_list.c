@@ -76,7 +76,9 @@ void free_list(list_t *head)
 
 void print_node(const list_t *const node)
 {
-    printf("[+] count iter: %d\n", node->data.count_iter);
+    printf("[+] queue elem: %d, address elem: %p\n",
+           node->data.count_iter,
+           (void *)node);
     // printf("[+] arrival time: %lf\n", node->data.arrival_time);
     // printf("[+] processing time: %lf\n", node->data.processing_time);
 }
@@ -98,6 +100,30 @@ void print_queue_list(list_t *const head)
     }
 }
 
+int create_free_addr(free_addr_t *free_addr)
+{
+    free_addr->free_addrs = calloc(free_addr->size, sizeof(addr_t));
+
+    if (!free_addr->free_addrs)
+    {
+        printf(VIOLET "[-] Ошибка выделения памяти!\n" RESET);
+        return ERR_ALLOC_MEM;
+    }
+
+    free_addr->top = -1;
+
+    return EXIT_SUCCESS;
+}
+
+void init_free_addrs(free_addr_t *free_addr)
+{
+    for (int i = 0; i < free_addr->size; i++)
+    {
+        free_addr->free_addrs[i].check_create = false;
+        free_addr->free_addrs[i].check_free = false;
+    }
+}
+
 void print_free_address(const free_addr_t *const free_addr)
 {
     if (free_addr->top == -1)
@@ -111,6 +137,6 @@ void print_free_address(const free_addr_t *const free_addr)
     for (int i = 0; i <= free_addr->top; i++)
     {
         printf("[+] free address: %p\n",
-               (void *)free_addr->array_free_addr[i]);
+               (void *)free_addr->free_addrs[i].addr);
     }
 }

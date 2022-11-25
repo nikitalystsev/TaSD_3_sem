@@ -17,7 +17,7 @@ void print_task_menu(const param_t *const param)
     printf("2 - Изменить время добавления;\n");
     printf("3 - Cмоделировать СМО, используя очередь в виде списка;\n");
     printf("4 - Cмоделировать СМО, используя очередь в виде массива;\n");
-    
+
     printf("\n0 - Выйти из программы.\n");
     printf("--------------------------------------------------------|\n");
     printf("\nВыберите пункт меню:\n" RESET);
@@ -107,7 +107,270 @@ void print_result(const model_t *const model, const param_t *const param)
     printf("|-------------------------------------------------------------------------------|\n" RESET);
 }
 
-// void print_func_measure(void)
-// {
+static int get_queue_arr_size(const queue_array_t *const queue)
+{
+    int size = 0;
 
-// }
+    size += sizeof(queue->size);
+    size += sizeof(queue->p_in);
+    size += sizeof(queue->p_out);
+    size += (sizeof(queue->queue_array[0]) * queue->size);
+
+    return size;
+}
+
+int print_size_info(void)
+{
+    queue_array_t queue_arr;
+    queue_arr.size = 1000;
+    queue_arr.queue_array = NULL;
+
+    queue_list_t queue_list;
+    queue_list.queue_list = NULL;
+    queue_list.size = 0;
+
+    int rc = 0;
+    if ((rc = create_queue_array(&queue_arr)) != 0)
+        goto free;
+
+    printf(YELLOW "\n|-------------------------------------------------------------------------------------|\n");
+    printf("│ Количество элементов │    Размер списка (байты)    │     Размер массива (байты)     │\n");
+    printf("|-------------------------------------------------------------------------------------|\n");
+    for (int i = 0; i < queue_arr.size; i++)
+    {
+        elem_t data = {.add_time = 0, .count_iter = 0, .process_time = 0};
+
+        if (i % 100 == 0)
+        {
+            int size_arr = get_queue_arr_size(&queue_arr);
+            int size_list = queue_list_size_in_bytes(&queue_list);
+
+            printf("|      %10d      |         %10d          |           %10d           |\n", i, size_list, size_arr);
+        }
+
+        push_back_queue_array(&queue_arr, &data);
+        list_t *node = create_node(data);
+        queue_list.queue_list =
+            push_back_queue_list(queue_list.queue_list, node);
+        queue_list.size++;
+    }
+
+    printf("|-------------------------------------------------------------------------------------|\n" RESET);
+
+free:
+    free_list(queue_list.queue_list);
+    free(queue_arr.queue_array);
+
+    return rc;
+}
+
+int print_add_queue_time(void)
+{
+    int rc = 0;
+
+    queue_array_t queue_arr;
+    queue_arr.size = 1000;
+    queue_arr.queue_array = NULL;
+
+    queue_list_t queue_list;
+    queue_list.queue_list = NULL;
+    queue_list.size = 0;
+
+    if ((rc = create_queue_array(&queue_arr)) != 0)
+        goto free;
+
+    printf(YELLOW "\n|-----------------------------------------------------------|\n");
+    printf("│                      │         Добавление элемента        │\n");
+    printf("| Количество элементов |------------------------------------|\n");
+    printf("│                      │      Список     │      Массив      │\n");
+    printf("|-----------------------------------------------------------|\n");
+
+    for (int i = 0; i < queue_arr.size; i++)
+    {
+        elem_t data = {.add_time = 0, .count_iter = 0, .process_time = 0};
+
+        long double beg = microseconds_now();
+        push_back_queue_array(&queue_arr, &data);
+        long double end = microseconds_now() - beg;
+
+        list_t *node = create_node(data);
+
+        beg = microseconds_now();
+        queue_list.queue_list =
+            push_back_queue_list(queue_list.queue_list, node);
+        long double end2 = microseconds_now() - beg;
+
+        queue_list.size++;
+
+        if (i == 10)
+            printf("|      %10d      |   %13.6Lf |    %13.6Lf |\n", i, end2, end);
+        if (i % 100 == 0 && i != 0)
+            printf("|      %10d      |   %13.6Lf |    %13.6Lf |\n", i, end2, end);
+    }
+
+    printf("|-----------------------------------------------------------|\n" RESET);
+
+free:
+    free_list(queue_list.queue_list);
+    free(queue_arr.queue_array);
+
+    return rc;
+}
+
+int print_pop_queue_time(void)
+{
+    int rc = 0;
+
+    queue_array_t queue_arr;
+    queue_arr.size = 1000;
+    queue_arr.queue_array = NULL;
+
+    queue_list_t queue_list;
+    queue_list.queue_list = NULL;
+    queue_list.size = 0;
+
+    if ((rc = create_queue_array(&queue_arr)) != 0)
+        goto free;
+
+    printf(YELLOW "\n|-----------------------------------------------------------|\n");
+    printf("│                      │          Удаление элемента         │\n");
+    printf("| Количество элементов |------------------------------------|\n");
+    printf("│                      │      Список     │      Массив      │\n");
+    printf("|-----------------------------------------------------------|\n");
+
+    for (int i = 0; i < queue_arr.size; i++)
+    {
+        elem_t data = {.add_time = 0, .count_iter = 0, .process_time = 0};
+        push_back_queue_array(&queue_arr, &data);
+        list_t *node = create_node(data);
+        queue_list.queue_list =
+            push_back_queue_list(queue_list.queue_list, node);
+        queue_list.size++;
+    }
+
+    for (int i = queue_list.size; i > 0; i--)
+    {
+        elem_t elem;
+
+        long double beg = microseconds_now();
+        pop_front_queue_array(&queue_arr);
+        long double end = microseconds_now() - beg;
+
+        beg = microseconds_now();
+        queue_list.queue_list =
+            pop_front_queue_list(queue_list.queue_list, &elem);
+        long double end2 = microseconds_now() - beg;
+
+        queue_list.size--;
+
+        if (i == 10)
+            printf("|      %10d      |   %13.6Lf |    %13.6Lf |\n", i, end2, end);
+        if (i % 100 == 0 && i != 0)
+            printf("|      %10d      |   %13.6Lf |    %13.6Lf |\n", i, end2, end);
+    }
+
+    printf("|-----------------------------------------------------------|\n" RESET);
+
+free:
+    free_list(queue_list.queue_list);
+    free(queue_arr.queue_array);
+
+    return rc;
+}
+
+int print_clean_queue_time(void)
+{
+    int rc = 0;
+
+    queue_array_t queue_arr;
+    queue_list_t queue_list;
+
+    printf(YELLOW "\n|-----------------------------------------------------------|\n");
+    printf("│                      │           Очистка очереди          │\n");
+    printf("| Количество элементов |------------------------------------|\n");
+    printf("│                      │      Список     │      Массив      │\n");
+    printf("|-----------------------------------------------------------|\n");
+
+    int count = 10;
+
+    for (int j = 0; j < 11; j++)
+    {
+        queue_arr.size = count;
+        queue_arr.queue_array = NULL;
+
+        queue_list.queue_list = NULL;
+        queue_list.size = 0;
+
+        if ((rc = create_queue_array(&queue_arr)) != 0)
+            return rc;
+
+        for (int i = 0; i < queue_arr.size; i++)
+        {
+            elem_t data = {.add_time = 0, .count_iter = 0, .process_time = 0};
+            push_back_queue_array(&queue_arr, &data);
+            list_t *node = create_node(data);
+            queue_list.queue_list =
+                push_back_queue_list(queue_list.queue_list, node);
+            queue_list.size++;
+        }
+
+        long double beg = microseconds_now();
+        free(queue_arr.queue_array);
+        long double end = microseconds_now() - beg;
+
+        beg = microseconds_now();
+        free_list(queue_list.queue_list);
+        long double end2 = microseconds_now() - beg;
+
+        if (count == 10)
+            printf("|      %10d      |   %13.6Lf |    %13.6Lf |\n", count, end2, end);
+        if (count % 100 == 0 && j != 0)
+            printf("|      %10d      |   %13.6Lf |    %13.6Lf |\n", count, end2, end);
+
+        if (j == 0)
+            count = 100;
+        else
+            count += 100;
+    }
+
+    printf("|-----------------------------------------------------------|\n");
+
+    return rc;
+}
+
+int print_create_queue_time(void)
+{
+    int rc = 0;
+
+    queue_array_t queue_arr;
+    queue_arr.size = 1000;
+    queue_list_t queue_list;
+    queue_list.queue_list = NULL;
+    queue_list.size = 0;
+
+    printf(YELLOW "\n|-----------------------------------------------------------|\n");
+    printf("│                      Cоздание очереди                     │\n");
+    printf("|-----------------------------------------------------------|\n");
+    printf("│          Список          |              Массив            │\n");
+    printf("|-----------------------------------------------------------|\n");
+
+    long double beg = microseconds_now();
+    create_queue_array(&queue_arr);
+    long double end = microseconds_now() - beg;
+
+    elem_t data = {.add_time = 0, .count_iter = 0, .process_time = 0};
+    list_t *node = create_node(data);
+
+    beg = microseconds_now();
+    queue_list.queue_list = push_back_queue_list(queue_list.queue_list, node);
+    long double end2 = microseconds_now() - beg;
+
+    printf("|   %13.6Lf          |         %13.6Lf          |\n", end2, end);
+
+    printf("|-----------------------------------------------------------|\n");
+
+    free_list(queue_list.queue_list);
+    free(queue_arr.queue_array);
+
+    return rc;
+}

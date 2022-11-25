@@ -5,6 +5,7 @@
 
 typedef struct list_t list_t;
 typedef struct queue_list_t queue_list_t;
+typedef struct addr_t addr_t;
 typedef struct free_addr_t free_addr_t;
 
 /// @brief односвязный список, содержащий данные
@@ -21,12 +22,20 @@ struct queue_list_t
     int size;           // количество злементов в списке
 };
 
+struct addr_t
+{
+    size_t *addr;
+    bool check_free;
+    bool check_create;
+};
+
 /// @brief массив свободных адресов
 struct free_addr_t
 {
     // массив ранее высвобожденных адресов
-    size_t *array_free_addr[MAX_FREE_ADDR_SIZE];
-    int top; // индекс последнего  добавленного элемента
+    addr_t *free_addrs;
+    int top;  // индекс последнего  добавленного элемента
+    int size; // размер массива адресов
 };
 
 list_t *create_node(const elem_t data);
@@ -44,6 +53,10 @@ void free_list(list_t *head);
 void print_node(const list_t *const node);
 
 void print_queue_list(list_t *const head);
+
+int create_free_addr(free_addr_t *free_addr);
+
+void init_free_addrs(free_addr_t *free_addr);
 
 void print_free_address(const free_addr_t *const free_addr);
 
