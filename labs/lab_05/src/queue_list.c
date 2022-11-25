@@ -1,6 +1,6 @@
 #include "queue_list.h"
 
-list_t *create_node(elem_t data)
+list_t *create_node(const elem_t data)
 {
     list_t *node = malloc(sizeof(list_t));
 
@@ -24,7 +24,7 @@ int check_node(const list_t *const node)
     return EXIT_SUCCESS;
 }
 
-list_t *push_back_queue_list(list_t *head, list_t *node)
+list_t *push_back_queue_list(list_t *const head, list_t *node)
 {
     list_t *tmp_head = head;
 
@@ -41,7 +41,7 @@ list_t *push_back_queue_list(list_t *head, list_t *node)
     return head;
 }
 
-list_t *pop_front_queue_list(list_t *head, elem_t *list_elem)
+list_t *pop_front_queue_list(list_t *const head, elem_t *const list_elem)
 {
     if (!head)
     {
@@ -58,7 +58,7 @@ list_t *pop_front_queue_list(list_t *head, elem_t *list_elem)
     return tmp_head;
 }
 
-void free_node(list_t *node)
+void free_node(list_t *const node)
 {
     free(node);
 }
@@ -74,14 +74,14 @@ void free_list(list_t *head)
     }
 }
 
-void print_node(list_t *node)
+void print_node(const list_t *const node)
 {
     printf("[+] count iter: %d\n", node->data.count_iter);
     // printf("[+] arrival time: %lf\n", node->data.arrival_time);
     // printf("[+] processing time: %lf\n", node->data.processing_time);
 }
 
-void print_queue_list(list_t *head)
+void print_queue_list(list_t *const head)
 {
     if (!head)
     {
@@ -98,7 +98,7 @@ void print_queue_list(list_t *head)
     }
 }
 
-void print_free_address(free_addr_t *const free_addr)
+void print_free_address(const free_addr_t *const free_addr)
 {
     if (free_addr->top == -1)
     {

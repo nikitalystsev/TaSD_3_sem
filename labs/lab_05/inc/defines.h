@@ -29,6 +29,7 @@
 #define COUNT_APPLICATION 1000
 #define COUNT_PRINT_APPLICATION 100
 #define MAX_FREE_ADDR_SIZE 10000
+#define MAX_SIZE_QUEUE 10000
 
 #define ERR_ALLOC_MEM 100
 #define ERR_READ_WORK 101
@@ -40,15 +41,15 @@
 #define ERR_READ_SIZE 108
 #define ERR_SIZE 109
 #define ERR_QUEUE_ELEM 110
-#define MAX_SIZE_QUEUE 10000
 
 typedef struct elem_t elem_t;
 
+/// @brief заявка
 struct elem_t
 {
-    double add_time;
-    double process_time;
-    int count_iter;
+    double add_time;     // время добавления
+    double process_time; // время обработки
+    int count_iter;      // количество проходов
 };
 
 #endif

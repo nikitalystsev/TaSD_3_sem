@@ -1,6 +1,6 @@
 #include "queue_array.h"
 
-int create_queue_array(queue_array_t *queue)
+int create_queue_array(queue_array_t *const queue)
 {
     queue->queue_array = calloc(queue->size, sizeof(elem_t));
 
@@ -18,7 +18,7 @@ int create_queue_array(queue_array_t *queue)
     return EXIT_SUCCESS;
 }
 
-void shift(queue_array_t *queue)
+void shift(queue_array_t *const queue)
 {
     for (int i = 0; i < queue->p_in; i++)
     {
@@ -28,7 +28,8 @@ void shift(queue_array_t *queue)
     queue->p_in--;
 }
 
-void push_back_queue_array(queue_array_t *queue, elem_t *data)
+void push_back_queue_array(queue_array_t *const queue,
+                           const elem_t *const data)
 {
     if (queue->p_in >= queue->size - 1)
     {
@@ -40,7 +41,7 @@ void push_back_queue_array(queue_array_t *queue, elem_t *data)
     queue->queue_array[++queue->p_in] = *data;
 }
 
-elem_t pop_front_queue_array(queue_array_t *queue)
+elem_t pop_front_queue_array(queue_array_t *const queue)
 {
     elem_t elem = queue->queue_array[queue->p_out];
 
@@ -57,7 +58,7 @@ elem_t pop_front_queue_array(queue_array_t *queue)
     return elem;
 }
 
-void print_queue_array(queue_array_t *queue)
+void print_queue_array(const queue_array_t *const queue)
 {
     if (queue->p_in == -1)
     {
