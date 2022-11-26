@@ -10,10 +10,14 @@ double random_double(double min, double max)
 
 int read_work_num(int *const number)
 {
-    printf(TURQ "Введите значение 0,"
-                " если хотите решить задачу моделирования СМО "
-                ", или введите значение 1, "
-                "если хотите работать с очередью в ручном режиме:\n" RESET);
+    printf(TURQ "Программа для работы с очередью. \n"
+                "Позволяет смоделировать СМО, "
+                "а также работать с очередью вручную\n");
+
+    printf("\nВведите значение 0,"
+           " если хотите решить задачу моделирования СМО "
+           ", или введите значение 1, "
+           "если хотите работать с очередью в ручном режиме:\n" RESET);
     if (scanf("%d", number) != 1)
     {
         printf(RED "[-] Некорректный ввод значения! "
@@ -40,7 +44,7 @@ static int read_task_menu_item(int8_t *const item)
         return ERR_READ_ITEM;
     }
 
-    if (*item < 0 || *item > 4)
+    if (*item < 0 || *item > 5)
     {
         printf(RED "[-] Неверный ввод пункта меню! "
                    "Пункт меню - целое число от 0 до 4\n" RESET);
@@ -105,6 +109,12 @@ int do_modeling(void)
     param_t param;
     fill_default_param(&param);
 
+    free_addr_t free_addr;
+    free_addr.size = MAX_FREE_ADDR_SIZE;
+    if ((rc = create_free_addr(&free_addr)) != 0)
+        return rc;
+    init_free_addrs(&free_addr);
+
     int8_t menu_item;
 
     while (true)
@@ -130,12 +140,15 @@ int do_modeling(void)
                 return rc;
             break;
         case 3:
-            if ((rc = model_list(&param)) != 0)
+            if ((rc = model_list(&param, &free_addr)) != 0)
                 return rc;
             break;
         case 4:
             if ((rc = model_arr(&param)) != 0)
                 return rc;
+            break;
+        case 5:
+            print_free_address(&free_addr);
             break;
         }
     }
@@ -152,7 +165,7 @@ static int read_menu_item(int8_t *const item)
         return ERR_READ_ITEM;
     }
 
-    if (*item < 0 || *item > 11)
+    if (*item < 0 || *item > 13)
     {
         printf(RED "[-] Неверный ввод пункта меню! "
                    "Пункт меню - целое число от 0 до 11\n" RESET);
@@ -213,7 +226,7 @@ int do_action(void)
     free_addr.size = MAX_SIZE_QUEUE;
 
     if ((rc = create_free_addr(&free_addr)) != 0)
-        return rc;
+        goto free;
     init_free_addrs(&free_addr);
 
     int check_queue_list = 0;
@@ -237,6 +250,8 @@ int do_action(void)
                     goto free;
                 if ((rc = create_queue_array(&queue_array)) != 0)
                     goto free;
+                printf(GREEN
+                       "[+] Очередь как массив была успешно создана!\n" RESET);
             }
             else
                 puts(VIOLET "[+] "
@@ -332,6 +347,12 @@ int do_action(void)
             break;
         case 11:
             print_free_address(&free_addr);
+            break;
+        case 12:
+            print_func_time();
+            break;
+        case 13:
+            print_size_info();
             break;
         }
     }

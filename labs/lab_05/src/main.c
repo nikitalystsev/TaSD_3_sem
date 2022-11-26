@@ -9,24 +9,23 @@ int main(void)
 {
     int rc = 0;
 
-    print_func_time();
 
-    // int work;
+    int work;
 
-    // if ((rc = read_work_num(&work)) != 0)
-    //     return rc;
+    if ((rc = read_work_num(&work)) != 0)
+        return rc;
 
 
-    // if (!work)
-    // {
-    //     if ((rc = do_modeling()) != 0)
-    //         return rc;
-    // }
-    // else
-    // {
-    //     if ((rc = do_action()) != 0)
-    //         return rc;
-    // }
+    if (!work)
+    {
+        if ((rc = do_modeling()) != 0)
+            return rc;
+    }
+    else
+    {
+        if ((rc = do_action()) != 0)
+            return rc;
+    }
 
     return rc;
 }

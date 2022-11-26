@@ -17,7 +17,8 @@ void print_task_menu(const param_t *const param)
     printf("2 - Изменить время добавления;\n");
     printf("3 - Cмоделировать СМО, используя очередь в виде списка;\n");
     printf("4 - Cмоделировать СМО, используя очередь в виде массива;\n");
-
+    printf("5 - Вывести информацию об использованных и освобожденных \n");
+    printf("    адресах при моделировании очереди в виде списка. \n");
     printf("\n0 - Выйти из программы.\n");
     printf("--------------------------------------------------------|\n");
     printf("\nВыберите пункт меню:\n" RESET);
@@ -75,6 +76,7 @@ void print_result(const model_t *const model, const param_t *const param)
 
     double fault_input = (100 * fabs(model->input_time - theor_input_time)) / theor_input_time;
     double fault_output = (100 * fabs(model->output_time - theor_output_time)) / theor_output_time;
+    double fault_model = (100 * fabs(model->model_time - theor_model_time)) / theor_model_time;
 
     printf(YELLOW "\n|-------------------------------------------------------------------------------|\n");
     printf("│             Название                │    Практические    │    Теоретические   │\n");
@@ -100,10 +102,13 @@ void print_result(const model_t *const model, const param_t *const param)
     printf("│                  Расчет погрешности                      │     Результат      │\n");
     printf("|----------------------------------------------------------|--------------------|\n");
     printf("│           -------Погрешность по входу--------            │                    │\n");
-    printf("│  100 * |Кол-во пришед. - Кол-во теорет| / Кол-во теорет. │ %10.6lf процент │\n", fault_input);
+    printf("│     100 * |Практ. время добавл. - Теорит.| / Теорет.     │ %10.6lf процент │\n", fault_input);
     printf("|----------------------------------------------------------|--------------------|\n");
     printf("│           -------Погрешность по выходу--------           │                    │\n");
-    printf("│  100 * |Практ. время модел-я - Теорит. | / Теорет.       │ %10.6lf процент │\n", fault_output);
+    printf("│     100 * |Практ. время обр. - Теорит. | / Теорет.       │ %10.6lf процент │\n", fault_output);
+    printf("|-------------------------------------------------------------------------------|\n" );
+    printf("│       -------Погрешность моделирования--------           │                    │\n");
+    printf("│     100 * |Практ. время модел. - Теорит. | / Теорет.     │ %10.6lf процент │\n", fault_model);
     printf("|-------------------------------------------------------------------------------|\n" RESET);
 }
 
@@ -122,7 +127,7 @@ static int get_queue_arr_size(const queue_array_t *const queue)
 int print_size_info(void)
 {
     queue_array_t queue_arr;
-    queue_arr.size = 1000;
+    queue_arr.size = 1001;
     queue_arr.queue_array = NULL;
 
     queue_list_t queue_list;
@@ -170,7 +175,7 @@ int print_add_queue_time(void)
     int rc = 0;
 
     queue_array_t queue_arr;
-    queue_arr.size = 1000;
+    queue_arr.size = 1050;
     queue_arr.queue_array = NULL;
 
     queue_list_t queue_list;

@@ -196,7 +196,7 @@ int model_arr(const param_t *const param)
     return rc;
 }
 
-int model_list(const param_t *const param)
+int model_list(const param_t *const param, free_addr_t *const free_addrs)
 {
     int rc = 0;
 
@@ -246,6 +246,10 @@ int model_list(const param_t *const param)
                 if ((rc = check_node(node)) != 0)
                     goto free;
 
+                free_addrs->free_addrs[++free_addrs->top].addr =
+                    (size_t *)node;
+                free_addrs->free_addrs[free_addrs->top].check_create = true;
+
                 queue.queue_list =
                     push_back_queue_list(queue.queue_list, node);
 
@@ -261,6 +265,10 @@ int model_list(const param_t *const param)
             else
             {
                 /* если в очереди есть элементы */
+                free_addrs->free_addrs[++free_addrs->top].addr =
+                    (size_t *)queue.queue_list;
+                free_addrs->free_addrs[free_addrs->top].check_free = true;
+
                 queue.queue_list =
                     pop_front_queue_list(queue.queue_list, &temp_elem);
                 queue.size--;
@@ -304,6 +312,10 @@ int model_list(const param_t *const param)
                     if ((rc = check_node(node)) != 0)
                         goto free;
 
+                    free_addrs->free_addrs[++free_addrs->top].addr =
+                        (size_t *)node;
+                    free_addrs->free_addrs[free_addrs->top].check_create = true;
+
                     queue.queue_list =
                         push_back_queue_list(queue.queue_list, node);
                     mem_size = queue_list_size_in_bytes(&queue);
@@ -332,6 +344,10 @@ int model_list(const param_t *const param)
                 if ((rc = check_node(node)) != 0)
                     goto free;
 
+                free_addrs->free_addrs[++free_addrs->top].addr =
+                    (size_t *)node;
+                free_addrs->free_addrs[free_addrs->top].check_create = true;
+                
                 queue.queue_list =
                     push_back_queue_list(queue.queue_list, node);
                 mem_size = queue_list_size_in_bytes(&queue);

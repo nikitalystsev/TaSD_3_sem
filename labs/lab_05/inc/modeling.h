@@ -41,6 +41,6 @@ void fill_default_param(param_t *const param);
 
 int model_arr(const param_t *const param);
 
-int model_list(const param_t *const param);
+int model_list(const param_t *const param, free_addr_t *const free_addrs);
 
 #endif

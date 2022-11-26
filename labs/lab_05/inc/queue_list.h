@@ -22,6 +22,7 @@ struct queue_list_t
     int size;           // количество злементов в списке
 };
 
+/// @brief адрес
 struct addr_t
 {
     size_t *addr;

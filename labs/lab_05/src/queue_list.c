@@ -136,7 +136,11 @@ void print_free_address(const free_addr_t *const free_addr)
 
     for (int i = 0; i <= free_addr->top; i++)
     {
-        printf("[+] free address: %p\n",
-               (void *)free_addr->free_addrs[i].addr);
+        if (free_addr->free_addrs[i].check_create)
+            printf("Созданный адрес: %p\n",
+                   (void *)free_addr->free_addrs[i].addr);
+        if (free_addr->free_addrs[i].check_free)
+            printf("Освобожденный адрес адрес: %p\n",
+                   (void *)free_addr->free_addrs[i].addr);
     }
 }
