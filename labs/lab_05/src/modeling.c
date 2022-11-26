@@ -42,7 +42,7 @@ int model_arr(const param_t *const param)
     srand(time(NULL));
 
     queue_array_t queue;
-    queue.size = MAX_SIZE_QUEUE / 10;
+    queue.size = MAX_SIZE_QUEUE;
 
     if ((rc = create_queue_array(&queue)) != 0)
     {
@@ -87,7 +87,12 @@ int model_arr(const param_t *const param)
                     flag = 1;
                 }
 
-                push_back_queue_array(&queue, &new_elem);
+                if ((rc = push_back_queue_array(&queue, &new_elem)) != 0)
+                {
+                    printf(RED "[-] При моделировании СМО произошло "
+                               "переполнение очереди!\n" RESET);
+                    goto free;
+                }
 
                 mem_size = queue_arr_size_in_bytes(&queue);
                 model.memory_size = max_int(model.memory_size, mem_size);
@@ -136,7 +141,13 @@ int model_arr(const param_t *const param)
                     добавляем ее обратно
                     */
                     model.output_time += temp_elem.process_time;
-                    push_back_queue_array(&queue, &temp_elem);
+
+                    if ((rc = push_back_queue_array(&queue, &temp_elem)) != 0)
+                    {
+                        printf(RED "[-] При моделировании СМО произошло "
+                                   "переполнение очереди!\n" RESET);
+                        goto free;
+                    }
 
                     mem_size = queue_arr_size_in_bytes(&queue);
                     model.memory_size = max_int(model.memory_size, mem_size);
@@ -159,7 +170,13 @@ int model_arr(const param_t *const param)
                 temp -= temp2;
                 model.input_time += new_elem.add_time;
                 model.output_time += new_elem.process_time;
-                push_back_queue_array(&queue, &new_elem);
+
+                if ((rc = push_back_queue_array(&queue, &new_elem)) != 0)
+                {
+                    printf(RED "[-] При моделировании СМО произошло "
+                               "переполнение очереди!\n" RESET);
+                    goto free;
+                }
 
                 mem_size = queue_arr_size_in_bytes(&queue);
                 model.memory_size = max_int(model.memory_size, mem_size);
@@ -191,6 +208,7 @@ int model_arr(const param_t *const param)
 
     print_result(&model, param);
 
+free:
     free(queue.queue_array);
 
     return rc;
@@ -241,8 +259,15 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
                     flag = 1;
                 }
 
-                list_t *node = create_node(new_elem);
+                if (queue.size >= MAX_SIZE_QUEUE)
+                {
+                    rc = ERR_QUEUE_OVERFLOW;
+                    printf(RED "[-] При моделировании СМО произошло "
+                               "переполнение очереди!\n" RESET);
+                    goto free;
+                }
 
+                list_t *node = create_node(new_elem);
                 if ((rc = check_node(node)) != 0)
                     goto free;
 
@@ -307,8 +332,16 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
                     добавляем ее обратно
                     */
                     model.output_time += temp_elem.process_time;
-                    list_t *node = create_node(temp_elem);
 
+                    if (queue.size >= MAX_SIZE_QUEUE)
+                    {
+                        rc = ERR_QUEUE_OVERFLOW;
+                        printf(RED "[-] При моделировании СМО произошло "
+                                   "переполнение очереди!\n" RESET);
+                        goto free;
+                    }
+
+                    list_t *node = create_node(temp_elem);
                     if ((rc = check_node(node)) != 0)
                         goto free;
 
@@ -318,6 +351,7 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
 
                     queue.queue_list =
                         push_back_queue_list(queue.queue_list, node);
+
                     mem_size = queue_list_size_in_bytes(&queue);
                     model.memory_size = max_int(model.memory_size, mem_size);
                     queue.size++;
@@ -339,15 +373,22 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
                 model.input_time += new_elem.add_time;
                 model.output_time += new_elem.process_time;
 
-                list_t *node = create_node(new_elem);
+                if (queue.size >= MAX_SIZE_QUEUE)
+                {
+                    rc = ERR_QUEUE_OVERFLOW;
+                    printf(RED "[-] При моделировании СМО произошло "
+                               "переполнение очереди!\n" RESET);
+                    goto free;
+                }
 
+                list_t *node = create_node(new_elem);
                 if ((rc = check_node(node)) != 0)
                     goto free;
 
                 free_addrs->free_addrs[++free_addrs->top].addr =
                     (size_t *)node;
                 free_addrs->free_addrs[free_addrs->top].check_create = true;
-                
+
                 queue.queue_list =
                     push_back_queue_list(queue.queue_list, node);
                 mem_size = queue_list_size_in_bytes(&queue);

@@ -16,7 +16,7 @@ struct queue_array_t
 
 int create_queue_array(queue_array_t *const queue);
 
-void push_back_queue_array(queue_array_t *const queue,
+int push_back_queue_array(queue_array_t *const queue,
                            const elem_t *const data);
 
 void shift(queue_array_t *const queue);

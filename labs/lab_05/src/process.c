@@ -132,26 +132,29 @@ int do_modeling(void)
         case 1:
             if ((rc = change_time(&param.min_process_time,
                                   &param.max_process_time)) != 0)
-                return rc;
+                goto free;
             break;
         case 2:
             if ((rc = change_time(&param.min_add_time,
                                   &param.max_add_time)) != 0)
-                return rc;
+                goto free;
             break;
         case 3:
             if ((rc = model_list(&param, &free_addr)) != 0)
-                return rc;
+                goto free;
             break;
         case 4:
             if ((rc = model_arr(&param)) != 0)
-                return rc;
+                goto free;
             break;
         case 5:
             print_free_address(&free_addr);
             break;
         }
     }
+
+free:
+    free(free_addr.free_addrs);
 
     return rc;
 }
@@ -184,7 +187,7 @@ static int read_size_queue_array(int *const size)
         return ERR_READ_SIZE;
     }
 
-    if (*size < 1 || *size > MAX_SIZE_QUEUE)
+    if (*size < 1 || *size > 10000)
     {
         printf(RED "[-] Неверный ввод размера очереди! "
                    "Размер очереди - целое число от 1 до 10000\n" RESET);
@@ -288,10 +291,17 @@ int do_action(void)
                 puts(VIOLET "[-] Очередь как массив не создана!" RESET);
             break;
         case 5:
-            free(queue_array.queue_array);
-            queue_array.queue_array = NULL;
-            puts(GREEN "[+] "
-                       "Очередь как массив была успешно очищена!" RESET);
+            if (!queue_array.queue_array)
+            {
+                puts(VIOLET "[-] Очередь как массив не создана!" RESET);
+            }
+            else
+            {
+                free(queue_array.queue_array);
+                queue_array.queue_array = NULL;
+                puts(GREEN "[+] "
+                           "Очередь как массив была успешно очищена!" RESET);
+            }
             break;
         case 6:
             if (!queue_list.queue_list)
@@ -312,6 +322,7 @@ int do_action(void)
                 list_t *node = create_node(list_elem);
                 queue_list.queue_list =
                     push_back_queue_list(queue_list.queue_list, node);
+                queue_list.size++;
                 puts(GREEN "[+] Элемент был успешно добавлен "
                            "в хвост очереди!" RESET);
             }
@@ -324,8 +335,11 @@ int do_action(void)
                 free_addr.free_addrs[++free_addr.top].addr =
                     (size_t *)queue_list.queue_list;
 
-                if ((queue_list.queue_list = pop_front_queue_list(
-                         queue_list.queue_list, &list_elem)) != NULL)
+                queue_list.queue_list = pop_front_queue_list(
+                    queue_list.queue_list, &list_elem);
+                queue_list.size--;
+
+                if (queue_list.size != 0)
                     puts(GREEN "[+] Элемент был успешно удален "
                                "из головы очереди!" RESET);
             }
@@ -339,11 +353,18 @@ int do_action(void)
                 puts(VIOLET "[-] Очередь как список не создана!" RESET);
             break;
         case 10:
-            free_list(queue_list.queue_list);
-            queue_list.queue_list = NULL;
-            check_queue_list = 0;
-            puts(GREEN "[+] "
-                       "Очередь как список была успешно очищена!" RESET);
+            if (!queue_list.queue_list)
+            {
+                puts(VIOLET "[-] Очередь как список не создана!" RESET);
+            }
+            else
+            {
+                free_list(queue_list.queue_list);
+                queue_list.queue_list = NULL;
+                check_queue_list = 0;
+                puts(GREEN "[+] "
+                           "Очередь как список была успешно очищена!" RESET);
+            }
             break;
         case 11:
             print_free_address(&free_addr);
@@ -360,7 +381,7 @@ int do_action(void)
 free:
     free(queue_array.queue_array);
     free_list(queue_list.queue_list);
-    free(free_addr.free_addrs);
+    // free(free_addr.free_addrs);
 
     return rc;
 }

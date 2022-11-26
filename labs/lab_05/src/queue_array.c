@@ -26,17 +26,19 @@ void shift(queue_array_t *const queue)
     queue->p_in--;
 }
 
-void push_back_queue_array(queue_array_t *const queue,
+int push_back_queue_array(queue_array_t *const queue,
                            const elem_t *const data)
 {
     if (queue->p_in >= queue->size - 1)
     {
         printf(VIOLET "[-] Очередь как массив заполнена максимально! "
                       "Добавление невозможно.\n" RESET);
-        return;
+        return ERR_QUEUE_OVERFLOW;
     }
 
     queue->queue_array[++queue->p_in] = *data;
+
+    return EXIT_SUCCESS;
 }
 
 elem_t pop_front_queue_array(queue_array_t *const queue)
