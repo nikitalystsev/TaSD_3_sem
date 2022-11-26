@@ -41,10 +41,10 @@ int model_arr(const param_t *const param)
 
     srand(time(NULL));
 
-    queue_array_t queue;
+    queue_arr_t queue;
     queue.size = MAX_SIZE_QUEUE;
 
-    if ((rc = create_queue_array(&queue)) != 0)
+    if ((rc = create_queue_arr(&queue)) != 0)
     {
         printf(VIOLET "[-] Ошибка выделения памяти!\n" RESET);
         return rc;
@@ -87,7 +87,7 @@ int model_arr(const param_t *const param)
                     flag = 1;
                 }
 
-                if ((rc = push_back_queue_array(&queue, &new_elem)) != 0)
+                if ((rc = push_queue_arr(&queue, &new_elem)) != 0)
                 {
                     printf(RED "[-] При моделировании СМО произошло "
                                "переполнение очереди!\n" RESET);
@@ -105,7 +105,7 @@ int model_arr(const param_t *const param)
             else
             {
                 /* если в очереди есть элементы */
-                temp_elem = pop_front_queue_array(&queue);
+                pop_queue_arr(&queue, &temp_elem);
                 machine = true;
                 model.count_calls_machine++;
                 temp = temp_elem.process_time;
@@ -142,7 +142,7 @@ int model_arr(const param_t *const param)
                     */
                     model.output_time += temp_elem.process_time;
 
-                    if ((rc = push_back_queue_array(&queue, &temp_elem)) != 0)
+                    if ((rc = push_queue_arr(&queue, &temp_elem)) != 0)
                     {
                         printf(RED "[-] При моделировании СМО произошло "
                                    "переполнение очереди!\n" RESET);
@@ -171,7 +171,7 @@ int model_arr(const param_t *const param)
                 model.input_time += new_elem.add_time;
                 model.output_time += new_elem.process_time;
 
-                if ((rc = push_back_queue_array(&queue, &new_elem)) != 0)
+                if ((rc = push_queue_arr(&queue, &new_elem)) != 0)
                 {
                     printf(RED "[-] При моделировании СМО произошло "
                                "переполнение очереди!\n" RESET);
@@ -209,7 +209,7 @@ int model_arr(const param_t *const param)
     print_result(&model, param);
 
 free:
-    free(queue.queue_array);
+    free(queue.queue);
 
     return rc;
 }
@@ -221,7 +221,7 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
     srand(time(NULL));
 
     queue_list_t queue;
-    queue.queue_list = NULL;
+    queue.queue = NULL;
     queue.size = 0;
 
     model_t model;
@@ -275,8 +275,7 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
                     (size_t *)node;
                 free_addrs->free_addrs[free_addrs->top].check_create = true;
 
-                queue.queue_list =
-                    push_back_queue_list(queue.queue_list, node);
+                queue.queue = push_queue_list(queue.queue, node);
 
                 mem_size = queue_list_size_in_bytes(&queue);
                 model.memory_size = max_int(model.memory_size, mem_size);
@@ -291,11 +290,10 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
             {
                 /* если в очереди есть элементы */
                 free_addrs->free_addrs[++free_addrs->top].addr =
-                    (size_t *)queue.queue_list;
+                    (size_t *)queue.queue;
                 free_addrs->free_addrs[free_addrs->top].check_free = true;
 
-                queue.queue_list =
-                    pop_front_queue_list(queue.queue_list, &temp_elem);
+                queue.queue = pop_queue_list(queue.queue, &temp_elem);
                 queue.size--;
                 machine = true;
                 model.count_calls_machine++;
@@ -349,8 +347,7 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
                         (size_t *)node;
                     free_addrs->free_addrs[free_addrs->top].check_create = true;
 
-                    queue.queue_list =
-                        push_back_queue_list(queue.queue_list, node);
+                    queue.queue = push_queue_list(queue.queue, node);
 
                     mem_size = queue_list_size_in_bytes(&queue);
                     model.memory_size = max_int(model.memory_size, mem_size);
@@ -389,8 +386,8 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
                     (size_t *)node;
                 free_addrs->free_addrs[free_addrs->top].check_create = true;
 
-                queue.queue_list =
-                    push_back_queue_list(queue.queue_list, node);
+                queue.queue = push_queue_list(queue.queue, node);
+
                 mem_size = queue_list_size_in_bytes(&queue);
                 model.memory_size = max_int(model.memory_size, mem_size);
                 flag = 0;
@@ -422,7 +419,7 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
     print_result(&model, param);
 
 free:
-    free_list(queue.queue_list);
+    free_list(queue.queue);
 
     return rc;
 }

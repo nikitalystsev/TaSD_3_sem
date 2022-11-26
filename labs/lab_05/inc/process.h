@@ -5,16 +5,15 @@
 #include "queue_array.h"
 #include "queue_list.h"
 #include "modeling.h"
+#include "read.h"
 
 double random_double(double min, double max);
-
-int read_work_num(int *const number);
 
 int do_modeling(void);
 
 int do_action(void);
 
-int queue_arr_size_in_bytes(const queue_array_t *const queue);
+int queue_arr_size_in_bytes(const queue_arr_t *const queue);
 
 int queue_list_size_in_bytes(const queue_list_t *const queue);
 

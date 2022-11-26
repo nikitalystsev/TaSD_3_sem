@@ -112,30 +112,30 @@ void print_result(const model_t *const model, const param_t *const param)
     printf("|-------------------------------------------------------------------------------|\n" RESET);
 }
 
-static int get_queue_arr_size(const queue_array_t *const queue)
+static int get_queue_arr_size(const queue_arr_t *const queue)
 {
     int size = 0;
 
     size += sizeof(queue->size);
     size += sizeof(queue->p_in);
     size += sizeof(queue->p_out);
-    size += (sizeof(queue->queue_array[0]) * queue->size);
+    size += (sizeof(queue->queue[0]) * queue->size);
 
     return size;
 }
 
 int print_size_info(void)
 {
-    queue_array_t queue_arr;
+    queue_arr_t queue_arr;
     queue_arr.size = 1001;
-    queue_arr.queue_array = NULL;
+    queue_arr.queue = NULL;
 
     queue_list_t queue_list;
-    queue_list.queue_list = NULL;
+    queue_list.queue = NULL;
     queue_list.size = 0;
 
     int rc = 0;
-    if ((rc = create_queue_array(&queue_arr)) != 0)
+    if ((rc = create_queue_arr(&queue_arr)) != 0)
         goto free;
 
     printf(YELLOW "\n|-------------------------------------------------------------------------------------|\n");
@@ -154,18 +154,17 @@ int print_size_info(void)
             printf("|-------------------------------------------------------------------------------------|\n");
         }
 
-        push_back_queue_array(&queue_arr, &data);
+        push_queue_arr(&queue_arr, &data);
         list_t *node = create_node(data);
-        queue_list.queue_list =
-            push_back_queue_list(queue_list.queue_list, node);
+        queue_list.queue = push_queue_list(queue_list.queue, node);
         queue_list.size++;
     }
 
     printf(RESET);
 
 free:
-    free_list(queue_list.queue_list);
-    free(queue_arr.queue_array);
+    free_list(queue_list.queue);
+    free(queue_arr.queue);
 
     return rc;
 }
@@ -174,15 +173,15 @@ int print_add_queue_time(void)
 {
     int rc = 0;
 
-    queue_array_t queue_arr;
+    queue_arr_t queue_arr;
     queue_arr.size = 1050;
-    queue_arr.queue_array = NULL;
+    queue_arr.queue = NULL;
 
     queue_list_t queue_list;
-    queue_list.queue_list = NULL;
+    queue_list.queue = NULL;
     queue_list.size = 0;
 
-    if ((rc = create_queue_array(&queue_arr)) != 0)
+    if ((rc = create_queue_arr(&queue_arr)) != 0)
         goto free;
 
     printf(YELLOW "\n|-----------------------------------------------------------|\n");
@@ -196,14 +195,13 @@ int print_add_queue_time(void)
         elem_t data = {.add_time = 0, .count_iter = 0, .process_time = 0};
 
         long double beg = microseconds_now();
-        push_back_queue_array(&queue_arr, &data);
+        push_queue_arr(&queue_arr, &data);
         long double end = microseconds_now() - beg;
 
         list_t *node = create_node(data);
 
         beg = microseconds_now();
-        queue_list.queue_list =
-            push_back_queue_list(queue_list.queue_list, node);
+        queue_list.queue = push_queue_list(queue_list.queue, node);
         long double end2 = microseconds_now() - beg;
 
         queue_list.size++;
@@ -223,8 +221,8 @@ int print_add_queue_time(void)
     printf(RESET);
 
 free:
-    free_list(queue_list.queue_list);
-    free(queue_arr.queue_array);
+    free_list(queue_list.queue);
+    free(queue_arr.queue);
 
     return rc;
 }
@@ -233,15 +231,15 @@ int print_pop_queue_time(void)
 {
     int rc = 0;
 
-    queue_array_t queue_arr;
+    queue_arr_t queue_arr;
     queue_arr.size = 1000;
-    queue_arr.queue_array = NULL;
+    queue_arr.queue = NULL;
 
     queue_list_t queue_list;
-    queue_list.queue_list = NULL;
+    queue_list.queue = NULL;
     queue_list.size = 0;
 
-    if ((rc = create_queue_array(&queue_arr)) != 0)
+    if ((rc = create_queue_arr(&queue_arr)) != 0)
         goto free;
 
     printf(YELLOW "\n|-----------------------------------------------------------|\n");
@@ -253,10 +251,9 @@ int print_pop_queue_time(void)
     for (int i = 0; i < queue_arr.size; i++)
     {
         elem_t data = {.add_time = 0, .count_iter = 0, .process_time = 0};
-        push_back_queue_array(&queue_arr, &data);
+        push_queue_arr(&queue_arr, &data);
         list_t *node = create_node(data);
-        queue_list.queue_list =
-            push_back_queue_list(queue_list.queue_list, node);
+        queue_list.queue = push_queue_list(queue_list.queue, node);
         queue_list.size++;
     }
 
@@ -265,12 +262,11 @@ int print_pop_queue_time(void)
         elem_t elem;
 
         long double beg = microseconds_now();
-        pop_front_queue_array(&queue_arr);
+        pop_queue_arr(&queue_arr, &elem);
         long double end = microseconds_now() - beg;
 
         beg = microseconds_now();
-        queue_list.queue_list =
-            pop_front_queue_list(queue_list.queue_list, &elem);
+        queue_list.queue = pop_queue_list(queue_list.queue, &elem);
         long double end2 = microseconds_now() - beg;
 
         queue_list.size--;
@@ -290,8 +286,8 @@ int print_pop_queue_time(void)
     printf(RESET);
 
 free:
-    free_list(queue_list.queue_list);
-    free(queue_arr.queue_array);
+    free_list(queue_list.queue);
+    free(queue_arr.queue);
 
     return rc;
 }
@@ -300,7 +296,7 @@ int print_clean_queue_time(void)
 {
     int rc = 0;
 
-    queue_array_t queue_arr;
+    queue_arr_t queue_arr;
     queue_list_t queue_list;
 
     printf(YELLOW "\n|-----------------------------------------------------------|\n");
@@ -314,30 +310,29 @@ int print_clean_queue_time(void)
     for (int j = 0; j < 11; j++)
     {
         queue_arr.size = count;
-        queue_arr.queue_array = NULL;
+        queue_arr.queue = NULL;
 
-        queue_list.queue_list = NULL;
+        queue_list.queue = NULL;
         queue_list.size = 0;
 
-        if ((rc = create_queue_array(&queue_arr)) != 0)
+        if ((rc = create_queue_arr(&queue_arr)) != 0)
             return rc;
 
         for (int i = 0; i < queue_arr.size; i++)
         {
             elem_t data = {.add_time = 0, .count_iter = 0, .process_time = 0};
-            push_back_queue_array(&queue_arr, &data);
+            push_queue_arr(&queue_arr, &data);
             list_t *node = create_node(data);
-            queue_list.queue_list =
-                push_back_queue_list(queue_list.queue_list, node);
+            queue_list.queue = push_queue_list(queue_list.queue, node);
             queue_list.size++;
         }
 
         long double beg = microseconds_now();
-        free(queue_arr.queue_array);
+        free(queue_arr.queue);
         long double end = microseconds_now() - beg;
 
         beg = microseconds_now();
-        free_list(queue_list.queue_list);
+        free_list(queue_list.queue);
         long double end2 = microseconds_now() - beg;
 
         if (count == 10)
@@ -366,10 +361,10 @@ int print_create_queue_time(void)
 {
     int rc = 0;
 
-    queue_array_t queue_arr;
+    queue_arr_t queue_arr;
     queue_arr.size = 1000;
     queue_list_t queue_list;
-    queue_list.queue_list = NULL;
+    queue_list.queue = NULL;
     queue_list.size = 0;
 
     printf(YELLOW "\n|-----------------------------------------------------------|\n");
@@ -379,22 +374,22 @@ int print_create_queue_time(void)
     printf("|-----------------------------------------------------------|\n");
 
     long double beg = microseconds_now();
-    create_queue_array(&queue_arr);
+    create_queue_arr(&queue_arr);
     long double end = microseconds_now() - beg;
 
     elem_t data = {.add_time = 0, .count_iter = 0, .process_time = 0};
     list_t *node = create_node(data);
 
     beg = microseconds_now();
-    queue_list.queue_list = push_back_queue_list(queue_list.queue_list, node);
+    queue_list.queue = push_queue_list(queue_list.queue, node);
     long double end2 = microseconds_now() - beg;
 
     printf("|   %13.6Lf          |         %13.6Lf          |\n", end2, end);
 
     printf("|-----------------------------------------------------------|\n" RESET);
 
-    free_list(queue_list.queue_list);
-    free(queue_arr.queue_array);
+    free_list(queue_list.queue);
+    free(queue_arr.queue);
 
     return rc;
 }

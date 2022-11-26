@@ -18,8 +18,8 @@ struct list_t
 /// @brief очередь в виде односвязного списка
 struct queue_list_t
 {
-    list_t *queue_list; // очередь в виде списка
-    int size;           // количество злементов в списке
+    list_t *queue; // очередь в виде списка
+    int size;      // количество злементов в списке
 };
 
 /// @brief адрес
@@ -43,9 +43,9 @@ list_t *create_node(const elem_t data);
 
 int check_node(const list_t *const node);
 
-list_t *push_back_queue_list(list_t *const head, list_t *node);
+list_t *push_queue_list(list_t *const head, list_t *node);
 
-list_t *pop_front_queue_list(list_t *const head, elem_t *const list_elem);
+list_t *pop_queue_list(list_t *const head, elem_t *const list_elem);
 
 void free_node(list_t *const node);
 
@@ -60,5 +60,17 @@ int create_free_addr(free_addr_t *free_addr);
 void init_free_addrs(free_addr_t *free_addr);
 
 void print_free_address(const free_addr_t *const free_addr);
+
+void make_queue_list(queue_list_t *const queue, int *const check);
+
+int add_elem_in_list(queue_list_t *const queue, int *const check,
+                     elem_t *const elem);
+
+void del_elem_from_list(queue_list_t *const queue, free_addr_t *const addrs,
+                        elem_t *const elem, int *const check);
+
+void print_list(queue_list_t *const queue, int *const check);
+
+void free_queue_list(queue_list_t *const queue, int *const check);
 
 #endif

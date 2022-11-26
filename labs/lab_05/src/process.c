@@ -8,86 +8,7 @@ double random_double(double min, double max)
     return min + x * (max - min);
 }
 
-int read_work_num(int *const number)
-{
-    printf(TURQ "Программа для работы с очередью. \n"
-                "Позволяет смоделировать СМО, "
-                "а также работать с очередью вручную\n");
-
-    printf("\nВведите значение 0,"
-           " если хотите решить задачу моделирования СМО "
-           ", или введите значение 1, "
-           "если хотите работать с очередью в ручном режиме:\n" RESET);
-    if (scanf("%d", number) != 1)
-    {
-        printf(RED "[-] Некорректный ввод значения! "
-                   "Выбор - целое число от 0 до 1\n" RESET);
-        return ERR_READ_WORK;
-    }
-
-    if (*number < 0 || *number > 1)
-    {
-        printf(RED "[-] Неверный ввод значения! "
-                   "Выбор - целое число от 0 до 1\n" RESET);
-        return ERR_WORK;
-    }
-
-    return EXIT_SUCCESS;
-}
-
-static int read_task_menu_item(int8_t *const item)
-{
-    if (scanf("%hhd", item) != 1)
-    {
-        printf(RED "[-] Некорректный ввод пункта меню! "
-                   "Пункт меню - целое число от 0 до 4\n" RESET);
-        return ERR_READ_ITEM;
-    }
-
-    if (*item < 0 || *item > 5)
-    {
-        printf(RED "[-] Неверный ввод пункта меню! "
-                   "Пункт меню - целое число от 0 до 4\n" RESET);
-        return ERR_ITEM;
-    }
-
-    return EXIT_SUCCESS;
-}
-
-static int read_range_time(double *const min, double *const max)
-{
-    puts("\nВведите минимальное значение времени:");
-    if (scanf("%lf", min) != 1)
-    {
-        printf(RED "[-] Некорректный ввод минимального времени!\n" RESET);
-        return ERR_READ_TIME;
-    }
-
-    puts("Введите максимальное значение времени:");
-    if (scanf("%lf", max) != 1)
-    {
-        printf(RED "[-] Некорректный ввод максимального времени!\n" RESET);
-        return ERR_READ_TIME;
-    }
-
-    if (*min >= *max)
-    {
-        printf(RED "[-] Неверный ввод! "
-                   "Минимум не дожен быть больше максимума\n" RESET);
-        return ERR_TIME;
-    }
-
-    if (*min < 0 || *max < 0)
-    {
-        printf(RED "[-] Неверный ввод! "
-                   "Значения не могут быть отрицательными!\n" RESET);
-        return ERR_TIME;
-    }
-
-    return EXIT_SUCCESS;
-}
-
-static int change_time(double *const min, double *const max)
+int change_time(double *const min, double *const max)
 {
     double tmp_min, tmp_max;
 
@@ -100,6 +21,50 @@ static int change_time(double *const min, double *const max)
     *max = tmp_max;
 
     return EXIT_SUCCESS;
+}
+
+int queue_arr_size_in_bytes(const queue_arr_t *const queue)
+{
+    int size = 0;
+
+    size += sizeof(queue->size);
+    size += sizeof(queue->p_in);
+    size += sizeof(queue->p_out);
+    size += (sizeof(queue->queue[0]) * (queue->p_in - queue->p_out + 1));
+
+    return size;
+}
+
+int queue_list_size_in_bytes(const queue_list_t *const queue)
+{
+    int size = 0;
+
+    size += sizeof(queue->size);
+    size += sizeof(queue->queue);
+    size += (sizeof(list_t) * queue->size);
+
+    return size;
+}
+
+int max_int(const int a, const int b)
+{
+    return (a > b) ? a : b;
+}
+
+double max_double(const double a, const double b)
+{
+    if (fabs(a - b) <= EPS)
+    {
+        return a;
+    }
+    else if (a < (b - EPS))
+    {
+        return b;
+    }
+    else
+    {
+        return a;
+    }
 }
 
 int do_modeling(void)
@@ -159,66 +124,16 @@ free:
     return rc;
 }
 
-static int read_menu_item(int8_t *const item)
-{
-    if (scanf("%hhd", item) != 1)
-    {
-        printf(RED "[-] Некорректный ввод пункта меню! "
-                   "Пункт меню - целое число от 0 до 11\n" RESET);
-        return ERR_READ_ITEM;
-    }
-
-    if (*item < 0 || *item > 13)
-    {
-        printf(RED "[-] Неверный ввод пункта меню! "
-                   "Пункт меню - целое число от 0 до 11\n" RESET);
-        return ERR_ITEM;
-    }
-
-    return EXIT_SUCCESS;
-}
-
-static int read_size_queue_array(int *const size)
-{
-    puts("Введите размер очереди как массива (целое число от 1 до 10000):");
-    if (scanf("%d", size) != 1)
-    {
-        printf(RED "[-] Некорректный ввод размера очереди!\n" RESET);
-        return ERR_READ_SIZE;
-    }
-
-    if (*size < 1 || *size > 10000)
-    {
-        printf(RED "[-] Неверный ввод размера очереди! "
-                   "Размер очереди - целое число от 1 до 10000\n" RESET);
-        return ERR_SIZE;
-    }
-
-    return EXIT_SUCCESS;
-}
-
-static int read_queue_elem(int *const num)
-{
-    puts("Введите элемент очереди - целое число:");
-    if (scanf("%d", num) != 1)
-    {
-        printf(RED "[-] Некорректный ввод элемента очереди!\n" RESET);
-        return ERR_QUEUE_ELEM;
-    }
-
-    return EXIT_SUCCESS;
-}
-
 int do_action(void)
 {
     int rc = 0;
 
-    queue_array_t queue_array;
-    queue_array.queue_array = NULL;
+    queue_arr_t queue_array;
+    queue_array.queue = NULL;
 
     queue_list_t queue_list;
     queue_list.size = 0;
-    queue_list.queue_list = NULL;
+    queue_list.queue = NULL;
 
     int8_t menu_item;
 
@@ -247,124 +162,40 @@ int do_action(void)
             exit(0);
             break;
         case 1:
-            if (!queue_array.queue_array)
-            {
-                if ((rc = read_size_queue_array(&queue_array.size)) != 0)
-                    goto free;
-                if ((rc = create_queue_array(&queue_array)) != 0)
-                    goto free;
-                printf(GREEN
-                       "[+] Очередь как массив была успешно создана!\n" RESET);
-            }
-            else
-                puts(VIOLET "[+] "
-                            "Очередь как массив была создана ранее!" RESET);
+            if ((rc = make_queue_arr(&queue_array)) != 0)
+                goto free;
             break;
         case 2:
-            if (queue_array.queue_array)
-            {
-                if ((rc = read_queue_elem(&arr_elem.count_iter)) != 0)
-                    goto free;
-                push_back_queue_array(&queue_array, &arr_elem);
-                if (queue_array.p_in != queue_array.size - 1)
-                    puts(GREEN "[+] Элемент был успешно добавлен "
-                               "в хвост очереди!" RESET);
-            }
-            else
-                puts(VIOLET "[-] Очередь как массив не создана!" RESET);
+            if ((rc = add_elem_in_arr(&queue_array, &arr_elem)) != 0)
+                goto free;
             break;
         case 3:
-            if (queue_array.queue_array)
-            {
-                pop_front_queue_array(&queue_array);
-                if (queue_array.p_in != -1)
-                    puts(GREEN "[+] Элемент был успешно удален "
-                               "из головы очереди!" RESET);
-            }
-            else
-                puts(VIOLET "[-] Очередь как массив не создана!" RESET);
+            if ((rc = del_elem_from_arr(&queue_array)) != 0)
+                goto free;
             break;
         case 4:
-            if (queue_array.queue_array)
-                print_queue_array(&queue_array);
-            else
-                puts(VIOLET "[-] Очередь как массив не создана!" RESET);
+            print_queue_arr(&queue_array);
             break;
         case 5:
-            if (!queue_array.queue_array)
-            {
-                puts(VIOLET "[-] Очередь как массив не создана!" RESET);
-            }
-            else
-            {
-                free(queue_array.queue_array);
-                queue_array.queue_array = NULL;
-                puts(GREEN "[+] "
-                           "Очередь как массив была успешно очищена!" RESET);
-            }
+            free_arr(&queue_array);
             break;
         case 6:
-            if (!queue_list.queue_list)
-            {
-                puts(GREEN "[+] "
-                           "Очередь как список была успешно создана!" RESET);
-                check_queue_list = 1;
-            }
-            else
-                puts(VIOLET "[+] "
-                            "Очередь как список была создана ранее!" RESET);
+            make_queue_list(&queue_list, &check_queue_list);
             break;
         case 7:
-            if (check_queue_list)
-            {
-                if ((rc = read_queue_elem(&list_elem.count_iter)) != 0)
-                    goto free;
-                list_t *node = create_node(list_elem);
-                queue_list.queue_list =
-                    push_back_queue_list(queue_list.queue_list, node);
-                queue_list.size++;
-                puts(GREEN "[+] Элемент был успешно добавлен "
-                           "в хвост очереди!" RESET);
-            }
-            else
-                puts(VIOLET "[-] Очередь как список еще не создана!" RESET);
+            if ((rc = add_elem_in_list(
+                     &queue_list, &check_queue_list, &list_elem)) != 0)
+                goto free;
             break;
         case 8:
-            if (check_queue_list)
-            {
-                free_addr.free_addrs[++free_addr.top].addr =
-                    (size_t *)queue_list.queue_list;
-
-                queue_list.queue_list = pop_front_queue_list(
-                    queue_list.queue_list, &list_elem);
-                queue_list.size--;
-
-                if (queue_list.size != 0)
-                    puts(GREEN "[+] Элемент был успешно удален "
-                               "из головы очереди!" RESET);
-            }
-            else
-                puts(VIOLET "[-] Очередь как список еще не создана!" RESET);
+            del_elem_from_list(&queue_list, &free_addr,
+                               &list_elem, &check_queue_list);
             break;
         case 9:
-            if (check_queue_list)
-                print_queue_list(queue_list.queue_list);
-            else
-                puts(VIOLET "[-] Очередь как список не создана!" RESET);
+            print_list(&queue_list, &check_queue_list);
             break;
         case 10:
-            if (!queue_list.queue_list)
-            {
-                puts(VIOLET "[-] Очередь как список не создана!" RESET);
-            }
-            else
-            {
-                free_list(queue_list.queue_list);
-                queue_list.queue_list = NULL;
-                check_queue_list = 0;
-                puts(GREEN "[+] "
-                           "Очередь как список была успешно очищена!" RESET);
-            }
+            free_queue_list(&queue_list, &check_queue_list);
             break;
         case 11:
             print_free_address(&free_addr);
@@ -379,53 +210,9 @@ int do_action(void)
     }
 
 free:
-    free(queue_array.queue_array);
-    free_list(queue_list.queue_list);
+    free(queue_array.queue);
+    free_list(queue_list.queue);
     // free(free_addr.free_addrs);
 
     return rc;
-}
-
-int queue_arr_size_in_bytes(const queue_array_t *const queue)
-{
-    int size = 0;
-
-    size += sizeof(queue->size);
-    size += sizeof(queue->p_in);
-    size += sizeof(queue->p_out);
-    size += (sizeof(queue->queue_array[0]) * (queue->p_in - queue->p_out + 1));
-
-    return size;
-}
-
-int queue_list_size_in_bytes(const queue_list_t *const queue)
-{
-    int size = 0;
-
-    size += sizeof(queue->size);
-    size += sizeof(queue->queue_list);
-    size += (sizeof(list_t) * queue->size);
-
-    return size;
-}
-
-int max_int(const int a, const int b)
-{
-    return (a > b) ? a : b;
-}
-
-double max_double(const double a, const double b)
-{
-    if (fabs(a - b) <= EPS)
-    {
-        return a;
-    }
-    else if (a < (b - EPS))
-    {
-        return b;
-    }
-    else
-    {
-        return a;
-    }
 }

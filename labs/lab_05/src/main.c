@@ -15,7 +15,6 @@ int main(void)
     if ((rc = read_work_num(&work)) != 0)
         return rc;
 
-
     if (!work)
     {
         if ((rc = do_modeling()) != 0)

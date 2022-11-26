@@ -1,12 +1,13 @@
 #include "queue_array.h"
+#include "read.h"
 
-int create_queue_array(queue_array_t *const queue)
+int create_queue_arr(queue_arr_t *const queue)
 {
-    queue->queue_array = calloc(queue->size, sizeof(elem_t));
+    queue->queue = malloc(queue->size * sizeof(elem_t));
 
-    if (!queue->queue_array)
+    if (!queue->queue)
     {
-        printf(VIOLET "[-] Ошибка выделения памяти!\n" RESET);
+        puts(VIOLET "[-] Ошибка выделения памяти!" RESET);
         return ERR_ALLOC_MEM;
     }
 
@@ -16,63 +17,145 @@ int create_queue_array(queue_array_t *const queue)
     return EXIT_SUCCESS;
 }
 
-void shift(queue_array_t *const queue)
+int push_queue_arr(queue_arr_t *const queue, const elem_t *const data)
+{
+    if (queue->p_in >= queue->size - 1)
+    {
+        puts(VIOLET "[-] Очередь как массив заполнена максимально! "
+                      "Добавление невозможно" RESET);
+        return ERR_QUEUE_OVERFLOW;
+    }
+
+    queue->queue[++queue->p_in] = *data;
+
+    return EXIT_SUCCESS;
+}
+
+void shift(queue_arr_t *const queue)
 {
     for (int i = 0; i < queue->p_in; i++)
     {
-        queue->queue_array[i] = queue->queue_array[i + 1];
+        queue->queue[i] = queue->queue[i + 1];
     }
 
     queue->p_in--;
 }
 
-int push_back_queue_array(queue_array_t *const queue,
-                           const elem_t *const data)
+int pop_queue_arr(queue_arr_t *const queue, elem_t *const elem)
 {
-    if (queue->p_in >= queue->size - 1)
-    {
-        printf(VIOLET "[-] Очередь как массив заполнена максимально! "
-                      "Добавление невозможно.\n" RESET);
-        return ERR_QUEUE_OVERFLOW;
-    }
-
-    queue->queue_array[++queue->p_in] = *data;
-
-    return EXIT_SUCCESS;
-}
-
-elem_t pop_front_queue_array(queue_array_t *const queue)
-{
-    elem_t elem = queue->queue_array[queue->p_out];
+    int rc = 0;
 
     if (queue->p_in == -1)
     {
         printf(VIOLET "[-] Очередь как массив пустая! "
                       "Удаление невозможно.\n" RESET);
+        return EMPTY_QUEUE;
     }
     else
     {
+        *elem = queue->queue[queue->p_out];
         shift(queue);
     }
 
-    return elem;
+    return rc;
 }
 
-void print_queue_array(const queue_array_t *const queue)
+void print_queue_arr(const queue_arr_t *const queue)
 {
+    if (!queue->queue)
+    {
+        puts(VIOLET "[-] Очередь как массив не создана!" RESET);
+        return;
+    }
+
     if (queue->p_in == -1)
     {
         puts(VIOLET "[+] Очередь как массив пустая!" RESET);
         return;
     }
 
-    printf("array:\n");
+    puts("array:");
+
     for (int8_t i = queue->p_out; i <= queue->p_in; i++)
     {
-        printf("[+] count iter: %d\n", queue->queue_array[i].count_iter);
-        // printf("[+] arrival time: %lf\n",
-        //        queue_array->queue_array[i].arrival_time);
-        // printf("[+] processing time: %lf\n",
-        //        queue_array->queue_array[i].processing_time);
+        printf("[+] queue elem: %d\n", queue->queue[i].count_iter);
+    }
+}
+
+int make_queue_arr(queue_arr_t *const queue)
+{
+    int rc = 0;
+
+    if (!queue->queue)
+    {
+        if ((rc = read_size_queue_array(&queue->size)) != 0)
+            return rc;
+        if ((rc = create_queue_arr(queue)) != 0)
+            return rc;
+
+        puts(GREEN "[+] Очередь как массив была успешно создана!" RESET);
+    }
+    else
+    {
+        puts(VIOLET "[+] Очередь как массив была создана ранее!" RESET);
+    }
+
+    return rc;
+}
+
+int add_elem_in_arr(queue_arr_t *const queue, elem_t *const elem)
+{
+    int rc = 0;
+
+    if (queue->queue)
+    {
+        if ((rc = read_queue_elem(&elem->count_iter)) != 0)
+            return rc;
+
+        push_queue_arr(queue, elem);
+
+        if (queue->p_in != queue->size - 1)
+            puts(GREEN "[+] Элемент был успешно добавлен "
+                       "в хвост очереди!" RESET);
+    }
+    else
+    {
+        puts(VIOLET "[-] Очередь как массив не создана!" RESET);
+    }
+
+    return rc;
+}
+
+int del_elem_from_arr(queue_arr_t *const queue)
+{
+    int rc = 0;
+
+    elem_t elem;
+
+    if (queue->queue)
+    {
+        if (pop_queue_arr(queue, &elem) != 0)
+            puts(GREEN "[+] Элемент был успешно удален "
+                       "из головы очереди!" RESET);
+    }
+    else
+    {
+        puts(VIOLET "[-] Очередь как массив не создана!" RESET);
+    }
+
+    return rc;
+}
+
+void free_arr(queue_arr_t *const queue)
+{
+    if (queue->queue)
+    {
+        free(queue->queue);
+        queue->queue = NULL;
+        puts(GREEN "[+] Очередь как массив была успешно очищена!" RESET);
+    }
+    else
+    {
+        puts(VIOLET "[-] Очередь как массив не создана!" RESET);
     }
 }
