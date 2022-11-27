@@ -16,7 +16,7 @@ SRC := $(wildcard $(PREF_SRC)*.c)
 OUT_OBJ := $(patsubst $(PREF_SRC)%.c, $(PREF_OUT)%.o, $(SRC))
 
 run : app.exe
-	$(VALGRIND) ./app.exe 
+	$(VALGRIND) ./app.exe data.txt
 
 app.exe : $(OUT_OBJ)
 	$(CC) $(OUT_OBJ) -o app.exe 
@@ -26,7 +26,10 @@ $(PREF_OUT)%.o : $(PREF_SRC)%.c
 
 include $(wildcard $(PREF_OUT)*.d)
 
-.PHONY : clean
+.PHONY : clean graph
+
+graph : 
+	dot -Tpng -O test.gv 
 
 clean : 
-	rm -Rf $(PREF_OUT) ./*.exe
+	rm -Rf $(PREF_OUT) ./*.exe ./*.svg ./*.png ./*.gv ./*.txt

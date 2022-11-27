@@ -21,4 +21,10 @@
 #define TURQ "\033[0;36m" // бирюзовый
 #define WHITE "\033[0;37m"
 
+#define ERR_OPEN_FILE 100
+
+#define COUNT_DATA 15
+#define MAX_DATA 100
+#define MIN_DATA 1
+
 #endif
