@@ -27,7 +27,7 @@ void tree_to_dot(vertex_t *root, FILE *file)
     tree_to_dot(root->right, file);
 }
 
-int export_to_dot(char *file_name, char *tree_name, tree_t *tree)
+int export_to_dot(const char *file_name, char *tree_name, tree_t *tree)
 {
     FILE *file = fopen(file_name, "w");
     if (!file)
@@ -43,5 +43,12 @@ int export_to_dot(char *file_name, char *tree_name, tree_t *tree)
 
     fclose(file);
 
-    return EXIT_SUCCESS;
+    char s[MAX_STR_SIZE];
+
+    snprintf(s, MAX_STR_SIZE, "dot -Tpng -O %s", file_name);
+
+    int rc = system(s);
+    rc = 0;
+
+    return rc;
 }

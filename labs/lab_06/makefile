@@ -11,12 +11,13 @@ VALGRIND := valgrind --track-origins=yes --leak-check=full \
 PREF_SRC := ./src/
 PREF_INC := ./inc/
 PREF_OUT := ./out/
+PREF_DATA := ./data/
 
 SRC := $(wildcard $(PREF_SRC)*.c)
 OUT_OBJ := $(patsubst $(PREF_SRC)%.c, $(PREF_OUT)%.o, $(SRC))
 
 run : app.exe
-	$(VALGRIND) ./app.exe data.txt
+	$(VALGRIND) ./app.exe 
 
 app.exe : $(OUT_OBJ)
 	$(CC) $(OUT_OBJ) -o app.exe 
@@ -26,10 +27,10 @@ $(PREF_OUT)%.o : $(PREF_SRC)%.c
 
 include $(wildcard $(PREF_OUT)*.d)
 
-.PHONY : clean graph
+.PHONY : clean del_data
 
-graph : 
-	dot -Tpng -O test.gv 
-
+del_data :
+	rm -Rf $(PREF_DATA)*
+	
 clean : 
-	rm -Rf $(PREF_OUT) ./*.exe ./*.svg ./*.png ./*.gv ./*.txt
+	rm -Rf $(PREF_OUT) ./*.exe ./*.svg ./*.png ./*.gv ./txt

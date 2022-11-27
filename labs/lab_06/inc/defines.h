@@ -26,5 +26,11 @@
 #define COUNT_DATA 15
 #define MAX_DATA 100
 #define MIN_DATA 1
+#define NOT_FOUND 101
+#define MAX_STR_SIZE 1000
+#define PATH "./data/"
+#define DATA "data1"
+#define GV ".gv"
+#define CHANGE "change_"
 
 #endif

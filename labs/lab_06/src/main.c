@@ -2,15 +2,15 @@
 #include "tree_visual.h"
 #include "gen_data.h"
 
-int main(int argc, char const *argv[])
+int main(void)
 {
     int rc = 0;
 
-    if (argc != 2)
-        return 1;
+    char *filename = PATH DATA;
 
-    // gen_data_file(argv[1]);
-    FILE *file = fopen(argv[1], "r");
+    gen_data_file(filename);
+
+    FILE *file = fopen(filename, "r");
 
     if (!file)
         return 2;
@@ -27,29 +27,27 @@ int main(int argc, char const *argv[])
 
         rc = fscanf(file, "%d", &data);
 
-        printf("[+] data = %d\n", data);
-
         vertex_t *vertex = create_vertex(data);
         if (!vertex)
-            return 3;
+            goto free;
 
         tree.root = add_vertex(tree.root, vertex);
     }
 
     fclose(file);
 
-    rc = export_to_dot("test.gv", "my_tree", &tree);
+    filename = PATH DATA GV;
 
-    int depth = get_tree_depth(tree.root);
+    rc = export_to_dot(filename, "my_tree", &tree);
+    printf("rc = %d\n", rc);
+    delete_vertex(&tree.root, 58);
 
-    printf("depth = %d\n", depth);
+    filename = PATH CHANGE DATA GV;
+    
+    rc = export_to_dot(filename, "my_tree", &tree);
 
-    for (int i = 0; i < depth; i++)
-    {
-        int c = get_count_vertex_in_level(tree.root, i, 0);
-        printf("lvl(%d) = %d\n", i, c);
-    }
-
+free:
+    free_tree(&tree);
 
     return rc;
 }

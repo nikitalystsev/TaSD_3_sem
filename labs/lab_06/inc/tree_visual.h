@@ -8,6 +8,6 @@ void vertex_to_dot(vertex_t *vertex, FILE *file);
 
 void tree_to_dot(vertex_t *root, FILE *file);
 
-int export_to_dot(char *file_name, char *tree_name, tree_t *tree);
+int export_to_dot(const char *file_name, char *tree_name, tree_t *tree);
 
 #endif
