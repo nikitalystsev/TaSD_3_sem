@@ -22,8 +22,11 @@
 #define WHITE "\033[0;37m"
 
 #define ERR_OPEN_FILE 100
+#define ERR_MENU_ITEM 102
+#define ERR_READ_DATA 103
+#define ERR_ALLOC_MEM 104
 
-#define COUNT_DATA 15
+#define COUNT_DATA 10
 #define MAX_DATA 100
 #define MIN_DATA 1
 #define NOT_FOUND 101

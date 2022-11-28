@@ -171,6 +171,17 @@ int delete_vertex(vertex_t **root, int data)
     return EXIT_SUCCESS;
 }
 
+bool is_empty_tree(tree_t *tree)
+{
+    if (!tree->root)
+    {
+        puts(VIOLET "\nДерево пустое" RESET);
+        return true;
+    }
+
+    return false;
+}
+
 void free_vertex(vertex_t *root)
 {
     if (root)
@@ -231,4 +242,23 @@ int get_count_vertex_in_level(vertex_t *root, int n, int c)
     }
 
     return count;
+}
+
+void print_tree(vertex_t *root, int p)
+{
+    if (!root)
+    {
+        return;
+    }
+
+    print_tree(root->right, p + 3);
+
+    printf("\n");
+    for (int i = 0; i < p; i++)
+    {
+        printf(" ");
+    }
+
+    printf("%3d\n", root->data);
+    print_tree(root->left, p + 3);
 }

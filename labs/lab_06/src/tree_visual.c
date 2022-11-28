@@ -32,6 +32,7 @@ int export_to_dot(const char *file_name, char *tree_name, tree_t *tree)
     FILE *file = fopen(file_name, "w");
     if (!file)
     {
+        puts(RED "Ошибка открытия файла!\n" RESET);
         return ERR_OPEN_FILE;
     }
 
@@ -48,7 +49,9 @@ int export_to_dot(const char *file_name, char *tree_name, tree_t *tree)
     snprintf(s, MAX_STR_SIZE, "dot -Tpng -O %s", file_name);
 
     int rc = system(s);
-    rc = 0;
+
+    if (rc == 0)
+        puts(GREEN "\nКартинка была успешно создана!" RESET);
 
     return rc;
 }

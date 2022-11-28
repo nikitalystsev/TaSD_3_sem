@@ -28,6 +28,8 @@ vertex_t *find_parent(vertex_t *root, vertex_t *vertex);
 
 int delete_vertex(vertex_t **root, int data);
 
+bool is_empty_tree(tree_t *tree);
+
 void free_vertex(vertex_t *root);
 
 void free_tree(tree_t *tree);
@@ -35,5 +37,7 @@ void free_tree(tree_t *tree);
 int get_tree_depth(vertex_t *root);
 
 int get_count_vertex_in_level(vertex_t *root, int n, int c);
+
+void print_tree(vertex_t *root, int p);
 
 #endif

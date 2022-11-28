@@ -1,53 +1,56 @@
 #include "defines.h"
 #include "tree_visual.h"
 #include "gen_data.h"
+#include "process.h"
 
 int main(void)
 {
     int rc = 0;
 
-    char *filename = PATH DATA;
+    rc = process();
 
-    gen_data_file(filename);
+//     char *filename = PATH DATA;
 
-    FILE *file = fopen(filename, "r");
+//     gen_data_file(filename);
 
-    if (!file)
-        return 2;
+//     FILE *file = fopen(filename, "r");
 
-    tree_t tree;
-    tree.root = NULL;
+//     if (!file)
+//         return 2;
 
-    int count;
-    rc = fscanf(file, "%d", &count);
+//     tree_t tree;
+//     tree.root = NULL;
 
-    for (int i = 0; i < count; i++)
-    {
-        int data;
+//     int count;
+//     rc = fscanf(file, "%d", &count);
 
-        rc = fscanf(file, "%d", &data);
+//     for (int i = 0; i < count; i++)
+//     {
+//         int data;
 
-        vertex_t *vertex = create_vertex(data);
-        if (!vertex)
-            goto free;
+//         rc = fscanf(file, "%d", &data);
 
-        tree.root = add_vertex(tree.root, vertex);
-    }
+//         vertex_t *vertex = create_vertex(data);
+//         if (!vertex)
+//             goto free;
 
-    fclose(file);
+//         tree.root = add_vertex(tree.root, vertex);
+//     }
 
-    filename = PATH DATA GV;
+//     fclose(file);
 
-    rc = export_to_dot(filename, "my_tree", &tree);
-    printf("rc = %d\n", rc);
-    delete_vertex(&tree.root, 58);
+//     filename = PATH DATA GV;
 
-    filename = PATH CHANGE DATA GV;
+//     rc = export_to_dot(filename, "my_tree", &tree);
+//     printf("rc = %d\n", rc);
+//     delete_vertex(&tree.root, 58);
+
+//     filename = PATH CHANGE DATA GV;
     
-    rc = export_to_dot(filename, "my_tree", &tree);
+//     rc = export_to_dot(filename, "my_tree", &tree);
 
-free:
-    free_tree(&tree);
+// free:
+//     free_tree(&tree);
 
     return rc;
 }
