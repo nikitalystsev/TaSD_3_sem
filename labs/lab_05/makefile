@@ -16,7 +16,7 @@ SRC := $(wildcard $(PREF_SRC)*.c)
 OUT_OBJ := $(patsubst $(PREF_SRC)%.c, $(PREF_OUT)%.o, $(SRC))
 
 run : app.exe
-	$(VALGRIND) ./app.exe 
+	./app.exe 
 
 app.exe : $(OUT_OBJ)
 	$(CC) $(OUT_OBJ) -o app.exe 

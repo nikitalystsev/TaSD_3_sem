@@ -189,14 +189,25 @@ void del_elem_from_list(queue_list_t *const queue, free_addr_t *const addrs,
 {
     if (*check)
     {
-        addrs->free_addrs[++addrs->top].addr = (size_t *)queue->queue;
+        if (queue->queue)
+        {
+            addrs->free_addrs[++addrs->top].addr = (size_t *)queue->queue;
+            
+            queue->queue = pop_queue_list(queue->queue, elem);
+            queue->size--;
 
-        queue->queue = pop_queue_list(queue->queue, elem);
-        queue->size--;
+            printf("size = %d\n", queue->size);
 
-        if (queue->size >= 0)
-            puts(GREEN "[+] Элемент был успешно "
-                       "удален из головы очереди!" RESET);
+            if (queue->size >= 0)
+            {
+                puts(GREEN "[+] Элемент был успешно "
+                           "удален из головы очереди!" RESET);
+            }
+        }
+        else
+        {
+            puts(VIOLET "[-] Очередь как список пустая!" RESET);
+        }
     }
     else
     {
@@ -226,6 +237,6 @@ void free_queue_list(queue_list_t *const queue, int *const check)
     }
     else
     {
-        puts(GREEN "[+] Очередь как список не была создана!" RESET);
+        puts(VIOLET "[+] Очередь как список не была создана!" RESET);
     }
 }

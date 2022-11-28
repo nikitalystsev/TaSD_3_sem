@@ -22,7 +22,7 @@ int push_queue_arr(queue_arr_t *const queue, const elem_t *const data)
     if (queue->p_in >= queue->size - 1)
     {
         puts(VIOLET "[-] Очередь как массив заполнена максимально! "
-                      "Добавление невозможно" RESET);
+                    "Добавление невозможно" RESET);
         return ERR_QUEUE_OVERFLOW;
     }
 
@@ -112,9 +112,7 @@ int add_elem_in_arr(queue_arr_t *const queue, elem_t *const elem)
         if ((rc = read_queue_elem(&elem->count_iter)) != 0)
             return rc;
 
-        push_queue_arr(queue, elem);
-
-        if (queue->p_in != queue->size - 1)
+        if (push_queue_arr(queue, elem) == 0)
             puts(GREEN "[+] Элемент был успешно добавлен "
                        "в хвост очереди!" RESET);
     }
@@ -134,7 +132,7 @@ int del_elem_from_arr(queue_arr_t *const queue)
 
     if (queue->queue)
     {
-        if (pop_queue_arr(queue, &elem) != 0)
+        if (pop_queue_arr(queue, &elem) == 0)
             puts(GREEN "[+] Элемент был успешно удален "
                        "из головы очереди!" RESET);
     }

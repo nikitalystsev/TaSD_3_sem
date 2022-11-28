@@ -67,6 +67,22 @@ double max_double(const double a, const double b)
     }
 }
 
+static void print_free_addr(const free_addr_t *const free_addr)
+{
+    if (free_addr->top == -1)
+    {
+        printf(VIOLET "\n[-] Массив свободных адресов пустой!\n" RESET);
+        return;
+    }
+
+    printf("\nМассив ранее высвобожденных адресов:\n\n");
+
+    for (int i = 0; i <= free_addr->top; i++)
+    {
+        printf("free address: %p\n", (void *)free_addr->free_addrs[i].addr);
+    }
+}
+
 int do_modeling(void)
 {
     int rc = 0;
@@ -198,7 +214,7 @@ int do_action(void)
             free_queue_list(&queue_list, &check_queue_list);
             break;
         case 11:
-            print_free_address(&free_addr);
+            print_free_addr(&free_addr);
             break;
         case 12:
             print_func_time();
