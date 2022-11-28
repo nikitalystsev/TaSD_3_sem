@@ -8,10 +8,23 @@ static int read_menu_item(int *item)
         return ERR_MENU_ITEM;
     }
 
-    if (*item < 0 || *item > 7)
+    if (*item < 0 || *item > 9)
     {
         puts(RED "\nНеверный номер пункта меню!" RESET);
         return ERR_MENU_ITEM;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+static int read_file_name(char *file_name)
+{
+    puts(TURQ "\nВведите имя файла:" RESET);
+
+    if (scanf("%s", file_name) != 1)
+    {
+        puts(RED "Невалидный ввод имени файла!" RESET);
+        return ERR_READ_DATA;
     }
 
     return EXIT_SUCCESS;
@@ -89,9 +102,6 @@ int add(tree_t *tree, int data)
 
     tree->root = add_vertex(tree->root, vertex);
 
-    if (rc == 0)
-        puts(GREEN "\nЭлемент был успешно добавлен в дерево" RESET);
-
     return rc;
 }
 
@@ -112,6 +122,7 @@ int add_file(const char *file_name, int data)
         fclose(file);
         return ERR_READ_DATA;
     }
+    // printf("count = %d\n", count);
     // считывание данных из файла в массив
     int *data_arr = malloc((count + 1) * sizeof(int));
     if (!data_arr)
@@ -138,6 +149,8 @@ int add_file(const char *file_name, int data)
     {
         return ERR_OPEN_FILE;
     }
+
+    // printf("записывает ага блять\n");
 
     fprintf(file, "%d\n", count + 1);
 
@@ -167,6 +180,79 @@ void del(tree_t *tree, int data)
     }
 }
 
+void clean_file(const char *file_name)
+{
+    FILE *file = fopen(file_name, "w");
+    fprintf(file, "%d\n", 0);
+    fclose(file);
+}
+
+void compare(tree_t *tree, const char *file_name)
+{
+    printf(YELLOW "\n|----------------------------------------------------------------|\n");
+    printf("│ Количество элементов │        Добавление элемента (мкс)        │\n");
+    printf("| Измерений для        |-----------------------------------------|\n");
+    printf("│ каждого случая = %3d │       Дерево       │        Файл        │\n", N_REPS);
+    printf("|----------------------------------------------------------------|\n");
+
+    srand(time(NULL));
+    int size = 1000;
+
+    long double end1, end2;
+
+    long double sum1 = 0, sum2 = 0;
+    for (int i = 0; i < N_REPS && size <= 10000;)
+    {
+        compare_time_add(tree, file_name, size, &end1, &end2);
+        free_tree(tree);
+        clean_file(file_name);
+
+        sum1 += end1, sum2 += end2;
+
+        if (i == N_REPS - 1)
+        {
+            sum1 = sum1 / N_REPS, sum2 = sum2 / N_REPS;
+            print_compare_time(sum1, sum2, size);
+            size += 1000;
+            sum1 = 0, sum2 = 0;
+            i = 0;
+        }
+        else
+            i++;
+    }
+}
+
+void compare_time_add(tree_t *tree, const char *file_name,
+                      int size, long double *end1, long double *end2)
+{
+    for (int i = 0; i < size; i++)
+    {
+        int data = MIN_DATA + rand() % (MAX_DATA - MIN_DATA + 1);
+
+        long double beg = microseconds_now();
+        add(tree, data);
+        *end1 = microseconds_now() - beg;
+
+        beg = microseconds_now();
+        add_file(file_name, data);
+        *end2 = microseconds_now() - beg;
+
+        // printf("\nend1 = %LF, end2 = %LF\n", *end1, *end2);
+    }
+}
+
+bool is_exist_file(const char *file_name)
+{
+    FILE *file = fopen(file_name, "r");
+
+    if (!file)
+        return false;
+
+    fclose(file);
+
+    return true;
+}
+
 int process(void)
 {
     int rc = 0;
@@ -175,12 +261,12 @@ int process(void)
     tree.root = NULL;
 
     int elem;
-    char *data = PATH DATA;
-    char *data_gv = PATH DATA GV;
+
+    char name[10000];
+    char data_file[10000] = PATH;
+    char data_gv[10000];
 
     int l = 0, t = 0;
-
-    // gen_data_file(data);
 
     while (true)
     {
@@ -198,7 +284,14 @@ int process(void)
             exit(0);
             break;
         case 1:
-            if ((rc = read_data(data, &tree)) != 0)
+            if ((rc = read_file_name(name)) != 0)
+                goto free;
+            strcat(data_file, name);
+            if (!is_exist_file(data_file))
+                gen_data_file(data_file);
+            strcpy(data_gv, data_file);
+            strcat(data_gv, GV);
+            if ((rc = read_data(data_file, &tree)) != 0)
                 goto free;
             break;
         case 2:
@@ -210,7 +303,7 @@ int process(void)
         case 3:
             if ((rc = read_elem_tree(&elem)) != 0)
                 goto free;
-            if ((rc = add_file(data, elem)) != 0)
+            if ((rc = add_file(data_file, elem)) != 0)
                 goto free;
             break;
         case 4:
@@ -223,6 +316,7 @@ int process(void)
                 print_tree(tree.root, 3);
             break;
         case 6:
+
             if (!is_empty_tree(&tree))
                 if ((rc = export_to_dot(data_gv, "my_tree", &tree)) != 0)
                     goto free;
@@ -236,8 +330,17 @@ int process(void)
             t = 0, l = 0;
             break;
         case 8:
+            free_tree(&tree);
+            clean_file("./data/compare.txt");
+            compare(&tree, "./data/compare.txt");
+            break;
+        case 9:
             if (!is_empty_tree(&tree))
+            {
                 free_tree(&tree);
+                puts(GREEN "\nДерево было успешно очищено!" RESET);
+            }
+            break;
         default:
             break;
         }

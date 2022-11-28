@@ -16,8 +16,14 @@ PREF_DATA := ./data/
 SRC := $(wildcard $(PREF_SRC)*.c)
 OUT_OBJ := $(patsubst $(PREF_SRC)%.c, $(PREF_OUT)%.o, $(SRC))
 
+.PHONY : run gen clean del_data
+
 run : app.exe
-	$(VALGRIND) ./app.exe 
+	./app.exe 
+
+gen : CFLAGS += -DGEN
+gen : app.exe
+	./app.exe
 
 app.exe : $(OUT_OBJ)
 	$(CC) $(OUT_OBJ) -o app.exe 
@@ -26,8 +32,6 @@ $(PREF_OUT)%.o : $(PREF_SRC)%.c
 	$(CC) $(CFLAGS) -c -MD $< -o $@
 
 include $(wildcard $(PREF_OUT)*.d)
-
-.PHONY : clean del_data
 
 del_data :
 	rm -Rf $(PREF_DATA)*

@@ -6,7 +6,13 @@
 #include "print.h"
 #include "tree_visual.h"
 #include "gen_data.h"
+#include "timing.h"
 
+void compare_time_add(tree_t *tree, const char *file_name,
+                      int size, long double *end1, long double *end2);
+
+void compare(tree_t *tree, const char *file_name);
+     
 int process(void);
 
 #endif
