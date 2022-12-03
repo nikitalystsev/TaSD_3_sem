@@ -34,7 +34,7 @@ struct model_t
     int count_output;        // количество вышедних заявок
     int count_calls_machine; // количество вызовов аппарата
     long double work_time;   // время работы (в микросекундах)
-    int memory_size;         // затраченный обьем памяти
+    int memory_size;         // затраченный обьем памяти (в байтах)
 };
 
 void fill_default_param(param_t *const param);

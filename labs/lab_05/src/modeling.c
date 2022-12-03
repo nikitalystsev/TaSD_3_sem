@@ -63,8 +63,6 @@ int model_arr(const param_t *const param)
     int count_len_beetw_print = 0;
     double sum_curr_len = 0;
 
-    double temp = 0, temp2 = 0;
-
     int flag = 0;
 
     int mem_size = 0;
@@ -73,19 +71,12 @@ int model_arr(const param_t *const param)
 
     while (model.count_output < param->count_appl)
     {
-        // printf("в цикле\n");
         if (!machine)
         {
-            /* если аппарат не работает */
-            // printf("аппарат не работает\n");
             if (queue.p_in == -1)
             {
-                /* если в очереди нет элементов */
                 if (!flag)
-                {
-                    create_new_appl(&new_elem, param);
-                    flag = 1;
-                }
+                    create_new_appl(&new_elem, param), flag = 1;
 
                 if ((rc = push_queue_arr(&queue, &new_elem)) != 0)
                 {
@@ -93,54 +84,35 @@ int model_arr(const param_t *const param)
                                "переполнение очереди!\n" RESET);
                     goto free;
                 }
-
-                mem_size = queue_arr_size_in_bytes(&queue);
-                model.memory_size = max_int(model.memory_size, mem_size);
-
                 flag = 0;
+
                 model.count_input++;
                 model.input_time += new_elem.add_time;
                 model.output_time += new_elem.process_time;
+
+                mem_size = queue_arr_size_in_bytes(&queue);
+                model.memory_size = max_int(model.memory_size, mem_size);
             }
             else
             {
-                /* если в очереди есть элементы */
                 pop_queue_arr(&queue, &temp_elem);
                 machine = true;
                 model.count_calls_machine++;
-                temp = temp_elem.process_time;
             }
         }
         else
         {
-            /* если аппарат работает */
-            // printf("аппарат работает\n");
             if (!flag)
-            {
-                create_new_appl(&new_elem, param);
-                temp2 = new_elem.add_time;
-                flag = 1;
-            }
+                create_new_appl(&new_elem, param), flag = 1;
 
-            if (temp2 > temp)
+            if (new_elem.add_time > temp_elem.process_time)
             {
-                /*
-                если заявка обработается раньше,
-                чем другая заявка придет в очередь,
-                то аппарат заканчивает работу
-                */
-                // temp2 -= temp;
                 machine = false;
                 temp_elem.count_iter++;
 
                 if (temp_elem.count_iter < COUNT_PROCESS)
                 {
-                    /*
-                    если из аппарата вышла заявк
-                    которая проходила очередь меньше 5 раз,
-                    добавляем ее обратно
-                    */
-                    model.output_time += temp_elem.process_time;
+                    model.output_time += random_double(param->min_process_time, param->max_process_time);
 
                     if ((rc = push_queue_arr(&queue, &temp_elem)) != 0)
                     {
@@ -149,25 +121,21 @@ int model_arr(const param_t *const param)
                         goto free;
                     }
 
+                    model.count_input++;
+
                     mem_size = queue_arr_size_in_bytes(&queue);
                     model.memory_size = max_int(model.memory_size, mem_size);
-
-                    model.count_input++;
                 }
                 else
-                {
-                    /* иначе покидает систему */
                     model.count_output++;
-                }
             }
+            else if (temp_elem.process_time > new_elem.add_time &&
+                     param->max_process_time > param->max_add_time)
+                temp_elem.process_time -= new_elem.add_time;
             else
             {
-                /*
-                если заявка обработается позже,
-                чем другая заявка придет в очередь,
-                то добавляем другую заявку
-                */
-                temp -= temp2;
+                temp_elem.process_time -= new_elem.add_time;
+
                 model.input_time += new_elem.add_time;
                 model.output_time += new_elem.process_time;
 
@@ -177,12 +145,12 @@ int model_arr(const param_t *const param)
                                "переполнение очереди!\n" RESET);
                     goto free;
                 }
+                flag = 0;
+
+                model.count_input++;
 
                 mem_size = queue_arr_size_in_bytes(&queue);
                 model.memory_size = max_int(model.memory_size, mem_size);
-
-                flag = 0;
-                model.count_input++;
             }
         }
 
@@ -237,8 +205,6 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
     int count_len_beetw_print = 0;
     double sum_curr_len = 0;
 
-    double temp = 0, temp2 = 0;
-
     int flag = 0;
 
     model.work_time = microseconds_now();
@@ -254,10 +220,7 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
             {
                 /* если в очереди нет элементов */
                 if (!flag)
-                {
-                    create_new_appl(&new_elem, param);
-                    flag = 1;
-                }
+                    create_new_appl(&new_elem, param), flag = 1;
 
                 if (queue.size >= MAX_SIZE_QUEUE)
                 {
@@ -276,15 +239,16 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
                 free_addrs->free_addrs[free_addrs->top].check_create = true;
 
                 queue.queue = push_queue_list(queue.queue, node);
-
-                mem_size = queue_list_size_in_bytes(&queue);
-                model.memory_size = max_int(model.memory_size, mem_size);
-
                 flag = 0;
+
                 queue.size++;
+
                 model.count_input++;
                 model.input_time += new_elem.add_time;
                 model.output_time += new_elem.process_time;
+
+                mem_size = queue_list_size_in_bytes(&queue);
+                model.memory_size = max_int(model.memory_size, mem_size);
             }
             else
             {
@@ -297,28 +261,21 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
                 queue.size--;
                 machine = true;
                 model.count_calls_machine++;
-                temp = temp_elem.process_time;
             }
         }
         else
         {
             /* если аппарат работает */
-
             if (!flag)
-            {
-                create_new_appl(&new_elem, param);
-                temp2 = new_elem.add_time;
-                flag = 1;
-            }
+                create_new_appl(&new_elem, param), flag = 1;
 
-            if (temp2 > temp)
+            if (new_elem.add_time > temp_elem.process_time)
             {
                 /*
                 если заявка обработается раньше,
                 чем другая заявка придет в очередь,
                 то аппарат заканчивает работу
                 */
-                // new_elem.arrival_time -= temp_elem.processing_time;
                 machine = false;
                 temp_elem.count_iter++;
 
@@ -329,7 +286,7 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
                     которая проходила очередь меньше 5 раз,
                     добавляем ее обратно
                     */
-                    model.output_time += temp_elem.process_time;
+                    model.output_time += random_double(param->min_process_time, param->max_process_time);
 
                     if (queue.size >= MAX_SIZE_QUEUE)
                     {
@@ -349,10 +306,11 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
 
                     queue.queue = push_queue_list(queue.queue, node);
 
-                    mem_size = queue_list_size_in_bytes(&queue);
-                    model.memory_size = max_int(model.memory_size, mem_size);
                     queue.size++;
                     model.count_input++;
+                    
+                    mem_size = queue_list_size_in_bytes(&queue);
+                    model.memory_size = max_int(model.memory_size, mem_size);
                 }
                 else
                 {
@@ -360,13 +318,17 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
                     model.count_output++;
                 }
             }
+            else if (temp_elem.process_time > new_elem.add_time &&
+                     param->max_process_time > param->max_add_time)
+                temp_elem.process_time -= new_elem.add_time;
             else
             {
                 /*
                 если заявка обработается позже,
                 чем другая заявка придет в очередь, то добавляем другую заявку
                 */
-                temp -= temp2;
+                temp_elem.process_time -= new_elem.add_time;
+
                 model.input_time += new_elem.add_time;
                 model.output_time += new_elem.process_time;
 
@@ -387,12 +349,13 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
                 free_addrs->free_addrs[free_addrs->top].check_create = true;
 
                 queue.queue = push_queue_list(queue.queue, node);
-
-                mem_size = queue_list_size_in_bytes(&queue);
-                model.memory_size = max_int(model.memory_size, mem_size);
                 flag = 0;
+
                 queue.size++;
                 model.count_input++;
+                
+                mem_size = queue_list_size_in_bytes(&queue);
+                model.memory_size = max_int(model.memory_size, mem_size);
             }
         }
 

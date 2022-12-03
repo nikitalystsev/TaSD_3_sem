@@ -34,9 +34,7 @@ int push_queue_arr(queue_arr_t *const queue, const elem_t *const data)
 void shift(queue_arr_t *const queue)
 {
     for (int i = 0; i < queue->p_in; i++)
-    {
         queue->queue[i] = queue->queue[i + 1];
-    }
 
     queue->p_in--;
 }
@@ -77,9 +75,7 @@ void print_queue_arr(const queue_arr_t *const queue)
     puts("array:");
 
     for (int8_t i = queue->p_out; i <= queue->p_in; i++)
-    {
         printf("[+] queue elem: %d\n", queue->queue[i].count_iter);
-    }
 }
 
 int make_queue_arr(queue_arr_t *const queue)
@@ -96,9 +92,7 @@ int make_queue_arr(queue_arr_t *const queue)
         puts(GREEN "[+] Очередь как массив была успешно создана!" RESET);
     }
     else
-    {
         puts(VIOLET "[+] Очередь как массив была создана ранее!" RESET);
-    }
 
     return rc;
 }
@@ -117,9 +111,7 @@ int add_elem_in_arr(queue_arr_t *const queue, elem_t *const elem)
                        "в хвост очереди!" RESET);
     }
     else
-    {
         puts(VIOLET "[-] Очередь как массив не создана!" RESET);
-    }
 
     return rc;
 }
@@ -137,9 +129,7 @@ int del_elem_from_arr(queue_arr_t *const queue)
                        "из головы очереди!" RESET);
     }
     else
-    {
         puts(VIOLET "[-] Очередь как массив не создана!" RESET);
-    }
 
     return rc;
 }
@@ -153,7 +143,5 @@ void free_arr(queue_arr_t *const queue)
         puts(GREEN "[+] Очередь как массив была успешно очищена!" RESET);
     }
     else
-    {
         puts(VIOLET "[-] Очередь как массив не создана!" RESET);
-    }
 }

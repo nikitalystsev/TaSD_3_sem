@@ -228,7 +228,7 @@ int do_action(void)
 free:
     free(queue_array.queue);
     free_list(queue_list.queue);
-    // free(free_addr.free_addrs);
+    free(free_addr.free_addrs);
 
     return rc;
 }
