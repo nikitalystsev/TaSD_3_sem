@@ -105,63 +105,78 @@ int add(tree_t *tree, int data)
     return rc;
 }
 
+// int add_file(const char *file_name, int data)
+// {
+//     int rc = 0;
+
+//     FILE *file = fopen(file_name, "r");
+//     if (!file)
+//     {
+//         return ERR_OPEN_FILE;
+//     }
+
+//     int count;
+
+//     if (fscanf(file, "%d", &count) != 1)
+//     {
+//         fclose(file);
+//         return ERR_READ_DATA;
+//     }
+
+//     // считывание данных из файла в массив
+//     int *data_arr = malloc((count + 1) * sizeof(int));
+//     if (!data_arr)
+//     {
+//         fclose(file);
+//         return ERR_ALLOC_MEM;
+//     }
+
+//     for (int i = 0; i < count; i++)
+//     {
+//         if (fscanf(file, "%d", &data_arr[i]) != 1)
+//         {
+//             fclose(file);
+//             return ERR_READ_DATA;
+//         }
+//     }
+//     // добавление нового элемента
+//     data_arr[count] = data;
+
+//     fclose(file);
+//     // запись измененного массива в файл
+//     file = fopen(file_name, "w");
+//     if (!file)
+//     {
+//         return ERR_OPEN_FILE;
+//     }
+
+//     fprintf(file, "%d\n", count + 1);
+
+//     for (int i = 0; i <= count; i++)
+//     {
+//         fprintf(file, "%d\n", data_arr[i]);
+//     }
+
+//     fclose(file);
+
+//     free(data_arr);
+
+//     return rc;
+// }
+
 int add_file(const char *file_name, int data)
 {
     int rc = 0;
 
-    FILE *file = fopen(file_name, "r");
+    FILE *file = fopen(file_name, "a");
     if (!file)
     {
         return ERR_OPEN_FILE;
     }
 
-    int count;
-
-    if (fscanf(file, "%d", &count) != 1)
-    {
-        fclose(file);
-        return ERR_READ_DATA;
-    }
-    // printf("count = %d\n", count);
-    // считывание данных из файла в массив
-    int *data_arr = malloc((count + 1) * sizeof(int));
-    if (!data_arr)
-    {
-        fclose(file);
-        return ERR_ALLOC_MEM;
-    }
-
-    for (int i = 0; i < count; i++)
-    {
-        if (fscanf(file, "%d", &data_arr[i]) != 1)
-        {
-            fclose(file);
-            return ERR_READ_DATA;
-        }
-    }
-    // добавление нового элемента
-    data_arr[count] = data;
-
+    fprintf(file, "%d\n", data);
+    
     fclose(file);
-    // запись измененного массива в файл
-    file = fopen(file_name, "w");
-    if (!file)
-    {
-        return ERR_OPEN_FILE;
-    }
-
-    // printf("записывает ага блять\n");
-
-    fprintf(file, "%d\n", count + 1);
-
-    for (int i = 0; i <= count; i++)
-    {
-        fprintf(file, "%d\n", data_arr[i]);
-    }
-
-    fclose(file);
-
-    free(data_arr);
 
     return rc;
 }
@@ -236,8 +251,6 @@ void compare_time_add(tree_t *tree, const char *file_name,
         beg = microseconds_now();
         add_file(file_name, data);
         *end2 = microseconds_now() - beg;
-
-        // printf("\nend1 = %LF, end2 = %LF\n", *end1, *end2);
     }
 }
 

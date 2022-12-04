@@ -12,7 +12,8 @@ void compare_time_add(tree_t *tree, const char *file_name,
                       int size, long double *end1, long double *end2);
 
 void compare(tree_t *tree, const char *file_name);
-     
+
+int add_file(const char *file_name, int data);
 int process(void);
 
 #endif
