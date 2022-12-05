@@ -85,7 +85,7 @@ int model_arr(const param_t *const param)
                     goto free;
                 }
                 flag = 0;
-
+                
                 model.count_input++;
                 model.input_time += new_elem.add_time;
                 model.output_time += new_elem.process_time;
@@ -112,7 +112,9 @@ int model_arr(const param_t *const param)
 
                 if (temp_elem.count_iter < COUNT_PROCESS)
                 {
-                    model.output_time += random_double(param->min_process_time, param->max_process_time);
+                    model.output_time +=
+                        random_double(param->min_process_time,
+                                      param->max_process_time);
 
                     if ((rc = push_queue_arr(&queue, &temp_elem)) != 0)
                     {
@@ -145,6 +147,7 @@ int model_arr(const param_t *const param)
                                "переполнение очереди!\n" RESET);
                     goto free;
                 }
+    
                 flag = 0;
 
                 model.count_input++;
@@ -286,7 +289,10 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
                     которая проходила очередь меньше 5 раз,
                     добавляем ее обратно
                     */
-                    model.output_time += random_double(param->min_process_time, param->max_process_time);
+
+                    model.output_time +=
+                        random_double(param->min_process_time,
+                                      param->max_process_time);
 
                     if (queue.size >= MAX_SIZE_QUEUE)
                     {
@@ -308,7 +314,7 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
 
                     queue.size++;
                     model.count_input++;
-                    
+
                     mem_size = queue_list_size_in_bytes(&queue);
                     model.memory_size = max_int(model.memory_size, mem_size);
                 }
@@ -353,7 +359,7 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
 
                 queue.size++;
                 model.count_input++;
-                
+
                 mem_size = queue_list_size_in_bytes(&queue);
                 model.memory_size = max_int(model.memory_size, mem_size);
             }

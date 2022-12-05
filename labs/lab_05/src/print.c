@@ -89,7 +89,7 @@ void print_result(const model_t *const model, const param_t *const param)
     printf("|-------------------------------------|--------------------|--------------------|\n");
     printf("│         Время простоя ОА            │ %13.6lf е.в. │ %10.0lf е.в.    │\n", model->downtime, theor_downtime);
     printf("|-------------------------------------|--------------------|--------------------|\n");
-    printf("│      Количество срабатываний        │ %10d е.в.    │ %5d +- 5 е.в.    │\n", model->count_calls_machine, theor_count_calls_machine);
+    printf("│      Количество срабатываний        │ %10d е.в.    │ %10d е.в.    │\n", model->count_calls_machine, theor_count_calls_machine);
     printf("|-------------------------------------|-----------------------------------------|\n");
     printf("│     Количество вошедших заявок      │             %10d                  │\n", model->count_input);
     printf("|-------------------------------------|-----------------------------------------|\n");
