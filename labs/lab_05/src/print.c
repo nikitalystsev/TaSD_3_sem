@@ -72,7 +72,7 @@ void print_result(const model_t *const model, const param_t *const param)
     double theor_output_time = ((param->max_process_time + param->min_process_time) / 2) * param->count_appl * COUNT_PROCESS;
     double theor_model_time = max_double(theor_input_time, theor_output_time);
     double theor_downtime = theor_input_time - theor_output_time;
-    int16_t theor_count_calls_machine = param->count_appl * COUNT_PROCESS;
+    // int16_t theor_count_calls_machine = param->count_appl * COUNT_PROCESS;
 
     double fault_input = (100 * fabs(model->input_time - theor_input_time)) / theor_input_time;
     double fault_output = (100 * fabs(model->output_time - theor_output_time)) / theor_output_time;
@@ -87,15 +87,18 @@ void print_result(const model_t *const model, const param_t *const param)
     printf("|-------------------------------------|--------------------|--------------------|\n");
     printf("│   Общее время обработки заявок      │ %13.6lf е.в. │ %10.0lf е.в.    │\n", model->output_time, theor_output_time);
     printf("|-------------------------------------|--------------------|--------------------|\n");
-    printf("│         Время простоя ОА            │ %13.6lf е.в. │ %10.0lf е.в.    │\n", model->downtime, theor_downtime);
-    printf("|-------------------------------------|--------------------|--------------------|\n");
-    printf("│      Количество срабатываний        │ %10d е.в.    │ %10d е.в.    │\n", model->count_calls_machine, theor_count_calls_machine);
+    if (model->downtime >= 0)
+    {
+        printf("│         Время простоя ОА            │ %13.6lf е.в. │ %10.0lf е.в.    │\n", model->downtime, theor_downtime);
+        printf("|-------------------------------------|--------------------|--------------------|\n");
+    }
+    printf("│      Количество срабатываний        │             %10d                  │\n", model->count_calls_machine);
     printf("|-------------------------------------|-----------------------------------------|\n");
     printf("│     Количество вошедших заявок      │             %10d                  │\n", model->count_input);
     printf("|-------------------------------------|-----------------------------------------|\n");
     printf("│     Количество вышедших заявок      │             %10d                  │\n", model->count_output);
     printf("|-------------------------------------|-----------------------------------------|\n");
-    printf("│    Время работы программы (мкс)     │               %13.6Lf             │\n", model->work_time);
+    printf("│    Время работы программы (мкс)     │               %15.6Lf           │\n", model->work_time);
     printf("|-------------------------------------|-----------------------------------------|\n");
     printf("│   Требуемый обьем памяти (байты)    │             %10d                  │\n", model->memory_size);
     printf("|-------------------------------------------------------------------------------|\n");
@@ -106,7 +109,7 @@ void print_result(const model_t *const model, const param_t *const param)
     printf("|----------------------------------------------------------|--------------------|\n");
     printf("│           -------Погрешность по выходу--------           │                    │\n");
     printf("│     100 * |Практ. время обр. - Теорит. | / Теорет.       │ %10.6lf процент │\n", fault_output);
-    printf("|-------------------------------------------------------------------------------|\n" );
+    printf("|-------------------------------------------------------------------------------|\n");
     printf("│       -------Погрешность моделирования--------           │                    │\n");
     printf("│     100 * |Практ. время модел. - Теорит. | / Теорет.     │ %10.6lf процент │\n", fault_model);
     printf("|-------------------------------------------------------------------------------|\n" RESET);

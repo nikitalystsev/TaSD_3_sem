@@ -127,11 +127,11 @@ void print_free_address(const free_addr_t *const free_addr)
 {
     if (free_addr->top == -1)
     {
-        printf(VIOLET "\n[-] Массив свободных адресов пустой!\n" RESET);
+        puts(VIOLET "\n[-] Массив свободных адресов пустой!" RESET);
         return;
     }
 
-    printf("\nМассив ранее высвобожденных адресов:\n\n");
+    puts("\nМассив ранее высвобожденных адресов:\n");
 
     for (int i = 0; i <= free_addr->top; i++)
     {
@@ -144,25 +144,23 @@ void print_free_address(const free_addr_t *const free_addr)
     }
 }
 
-void make_queue_list(queue_list_t *const queue, int *const check)
+void make_queue_list(queue_list_t *const queue, int *const is_create)
 {
     if (!queue->queue)
     {
         puts(GREEN "[+] Очередь как список была успешно создана!" RESET);
-        *check = 1;
+        *is_create = 1;
     }
     else
-    {
         puts(VIOLET "[+] Очередь как список была создана ранее!" RESET);
-    }
 }
 
-int add_elem_in_list(queue_list_t *const queue, int *const check,
+int add_elem_in_list(queue_list_t *const queue, const int is_create,
                      elem_t *const elem)
 {
     int rc = 0;
 
-    if (*check)
+    if (is_create)
     {
         if ((rc = read_queue_elem(&elem->count_iter)) != 0)
             return rc;
@@ -177,17 +175,15 @@ int add_elem_in_list(queue_list_t *const queue, int *const check,
         puts(GREEN "[+] Элемент был успешно добавлен в хвост очереди!" RESET);
     }
     else
-    {
         puts(VIOLET "[-] Очередь как список еще не создана!" RESET);
-    }
 
     return rc;
 }
 
 void del_elem_from_list(queue_list_t *const queue, free_addr_t *const addrs,
-                        elem_t *const elem, int *const check)
+                        elem_t *const elem, const int is_create)
 {
-    if (*check)
+    if (is_create)
     {
         if (queue->queue)
         {
@@ -196,47 +192,33 @@ void del_elem_from_list(queue_list_t *const queue, free_addr_t *const addrs,
             queue->queue = pop_queue_list(queue->queue, elem);
             queue->size--;
 
-            printf("size = %d\n", queue->size);
-
             if (queue->size >= 0)
-            {
                 puts(GREEN "[+] Элемент был успешно "
                            "удален из головы очереди!" RESET);
-            }
         }
         else
-        {
             puts(VIOLET "[-] Очередь как список пустая!" RESET);
-        }
     }
     else
-    {
         puts(VIOLET "[-] Очередь как список еще не создана!" RESET);
-    }
 }
 
-void print_list(queue_list_t *const queue, int *const check)
+void print_list(queue_list_t *const queue, const int is_create)
 {
-    if (*check)
-    {
+    if (is_create)
         print_queue_list(queue->queue);
-    }
     else
-    {
         puts(VIOLET "[-] Очередь как список не создана!" RESET);
-    }
 }
 
-void free_queue_list(queue_list_t *const queue, int *const check)
+void free_queue_list(queue_list_t *const queue, int *const is_create)
 {
-    if (*check)
+    if (*is_create)
     {
         free_list(queue->queue);
-        *check = 0;
+        *is_create = 0;
         puts(GREEN "[+] Очередь как список была успешно очищена!" RESET);
     }
     else
-    {
         puts(VIOLET "[+] Очередь как список не была создана!" RESET);
-    }
 }

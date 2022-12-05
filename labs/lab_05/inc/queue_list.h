@@ -61,16 +61,17 @@ void init_free_addrs(free_addr_t *free_addr);
 
 void print_free_address(const free_addr_t *const free_addr);
 
-void make_queue_list(queue_list_t *const queue, int *const check);
+/* Функции для обработки действий пользователя в меню */
+void make_queue_list(queue_list_t *const queue, int *const is_create);
 
-int add_elem_in_list(queue_list_t *const queue, int *const check,
+int add_elem_in_list(queue_list_t *const queue, const int is_create,
                      elem_t *const elem);
 
 void del_elem_from_list(queue_list_t *const queue, free_addr_t *const addrs,
-                        elem_t *const elem, int *const check);
+                        elem_t *const elem, const int is_create);
 
-void print_list(queue_list_t *const queue, int *const check);
+void print_list(queue_list_t *const queue, const int is_create);
 
-void free_queue_list(queue_list_t *const queue, int *const check);
+void free_queue_list(queue_list_t *const queue, int *const is_create);
 
 #endif

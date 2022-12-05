@@ -29,7 +29,7 @@ int read_size_queue_array(int *const size)
         return ERR_READ_SIZE;
     }
 
-    if (*size < 1 || *size > 10000)
+    if (*size < 1 || *size > MAX_INPUT_SIZE)
     {
         puts(RED "[-] Неверный ввод размера очереди! "
                  "Размер очереди - целое число от 1 до 10000" RESET);
@@ -85,14 +85,14 @@ int read_task_menu_item(int8_t *const item)
     if (scanf("%hhd", item) != 1)
     {
         puts(RED "[-] Некорректный ввод пункта меню! "
-                 "Пункт меню - целое число от 0 до 4" RESET);
+                 "Пункт меню - целое число от 0 до 5" RESET);
         return ERR_READ_ITEM;
     }
 
     if (*item < 0 || *item > 5)
     {
         puts(RED "[-] Неверный ввод пункта меню! "
-                 "Пункт меню - целое число от 0 до 4" RESET);
+                 "Пункт меню - целое число от 0 до 5" RESET);
         return ERR_ITEM;
     }
 
@@ -109,7 +109,7 @@ int read_range_time(double *const min, double *const max)
         return ERR_READ_TIME;
     }
 
-    puts("Введите максимальное значение времени:");
+    puts("\nВведите максимальное значение времени:");
 
     if (scanf("%lf", max) != 1)
     {

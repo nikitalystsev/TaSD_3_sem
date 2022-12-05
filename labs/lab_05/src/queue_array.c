@@ -45,8 +45,8 @@ int pop_queue_arr(queue_arr_t *const queue, elem_t *const elem)
 
     if (queue->p_in == -1)
     {
-        printf(VIOLET "[-] Очередь как массив пустая! "
-                      "Удаление невозможно.\n" RESET);
+        puts(VIOLET "[-] Очередь как массив пустая! "
+                      "Удаление невозможно." RESET);
         return EMPTY_QUEUE;
     }
     else
@@ -72,7 +72,7 @@ void print_queue_arr(const queue_arr_t *const queue)
         return;
     }
 
-    puts("array:");
+    puts("Очередь:");
 
     for (int8_t i = queue->p_out; i <= queue->p_in; i++)
         printf("[+] queue elem: %d\n", queue->queue[i].count_iter);
@@ -116,10 +116,8 @@ int add_elem_in_arr(queue_arr_t *const queue, elem_t *const elem)
     return rc;
 }
 
-int del_elem_from_arr(queue_arr_t *const queue)
+void del_elem_from_arr(queue_arr_t *const queue)
 {
-    int rc = 0;
-
     elem_t elem;
 
     if (queue->queue)
@@ -130,8 +128,6 @@ int del_elem_from_arr(queue_arr_t *const queue)
     }
     else
         puts(VIOLET "[-] Очередь как массив не создана!" RESET);
-
-    return rc;
 }
 
 void free_arr(queue_arr_t *const queue)

@@ -3,7 +3,6 @@
 
 #include "defines.h"
 
-
 typedef struct queue_arr_t queue_arr_t;
 
 /// @brief очередь как массив
@@ -25,11 +24,12 @@ int pop_queue_arr(queue_arr_t *const queue, elem_t *const elem);
 
 void print_queue_arr(const queue_arr_t *const queue);
 
+/* Функции для выполнения пунктов меню */
 int make_queue_arr(queue_arr_t *const queue);
 
 int add_elem_in_arr(queue_arr_t *const queue, elem_t *const elem);
 
-int del_elem_from_arr(queue_arr_t *const queue);
+void del_elem_from_arr(queue_arr_t *const queue);
 
 void free_arr(queue_arr_t *const queue);
 
