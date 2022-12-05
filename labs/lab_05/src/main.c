@@ -9,13 +9,6 @@ int main(void)
 {
     int rc = 0;
 
-    // free_addr_t free_addr;
-    // free_addr.free_addrs = NULL;
-    // free_addr.size = MAX_FREE_ADDR_SIZE;
-
-    // if ((rc = create_free_addr(&free_addr)) != 0)
-    //     return rc;
-
     int work;
 
     if ((rc = read_work_num(&work)) != 0)
@@ -31,8 +24,6 @@ int main(void)
         if ((rc = do_action()) != 0)
             return rc;
     }
-
-    // free(free_addr.free_addrs);
 
     return rc;
 }
