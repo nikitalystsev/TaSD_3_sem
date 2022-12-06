@@ -66,7 +66,7 @@ int model_arr(const param_t *const param)
     int flag = 0;
 
     int mem_size = 0;
-
+    int size = 0;
     model.work_time = microseconds_now();
 
     while (model.count_output < param->count_appl)
@@ -89,7 +89,7 @@ int model_arr(const param_t *const param)
                 model.count_input++;
                 model.input_time += new_elem.add_time;
                 model.output_time += new_elem.process_time;
-
+                size++;
                 mem_size = queue_arr_size_in_bytes(&queue);
                 model.memory_size = max_int(model.memory_size, mem_size);
             }
@@ -98,6 +98,7 @@ int model_arr(const param_t *const param)
                 pop_queue_arr(&queue, &temp_elem);
                 machine = true;
                 model.count_calls_machine++;
+                size--;
             }
         }
         else
@@ -122,7 +123,7 @@ int model_arr(const param_t *const param)
                                    "переполнение очереди!\n" RESET);
                         goto free;
                     }
-
+                    size++;
                     model.count_input++;
 
                     mem_size = queue_arr_size_in_bytes(&queue);
@@ -133,7 +134,10 @@ int model_arr(const param_t *const param)
             }
             else if (temp_elem.process_time > new_elem.add_time &&
                      param->max_process_time > param->max_add_time)
+            {
                 temp_elem.process_time -= new_elem.add_time;
+                size++;
+            }
             else
             {
                 temp_elem.process_time -= new_elem.add_time;
@@ -151,19 +155,19 @@ int model_arr(const param_t *const param)
                 flag = 0;
 
                 model.count_input++;
-
+                size++;
                 mem_size = queue_arr_size_in_bytes(&queue);
                 model.memory_size = max_int(model.memory_size, mem_size);
             }
         }
 
-        sum_curr_len += (queue.p_in - queue.p_out + 1);
+        sum_curr_len += size;
         count_len_beetw_print++;
 
         if (model.count_output == i)
         {
             model.av_len_queue = sum_curr_len / count_len_beetw_print;
-            model.curr_len_queue = queue.p_in - queue.p_out + 1;
+            model.curr_len_queue = size;
             print_intermediate(&model);
             sum_curr_len = 0;
             count_len_beetw_print = 0;
@@ -210,6 +214,8 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
 
     int flag = 0;
 
+    int size = 0;
+
     model.work_time = microseconds_now();
 
     int mem_size = 0;
@@ -245,7 +251,7 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
                 flag = 0;
 
                 queue.size++;
-
+                size++;
                 model.count_input++;
                 model.input_time += new_elem.add_time;
                 model.output_time += new_elem.process_time;
@@ -262,6 +268,7 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
 
                 queue.queue = pop_queue_list(queue.queue, &temp_elem);
                 queue.size--;
+                size--;
                 machine = true;
                 model.count_calls_machine++;
             }
@@ -313,6 +320,7 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
                     queue.queue = push_queue_list(queue.queue, node);
 
                     queue.size++;
+                    size++;
                     model.count_input++;
 
                     mem_size = queue_list_size_in_bytes(&queue);
@@ -326,7 +334,10 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
             }
             else if (temp_elem.process_time > new_elem.add_time &&
                      param->max_process_time > param->max_add_time)
+            {
                 temp_elem.process_time -= new_elem.add_time;
+                size++;
+            }
             else
             {
                 /*
@@ -358,6 +369,7 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
                 flag = 0;
 
                 queue.size++;
+                size++;
                 model.count_input++;
 
                 mem_size = queue_list_size_in_bytes(&queue);
@@ -365,13 +377,13 @@ int model_list(const param_t *const param, free_addr_t *const free_addrs)
             }
         }
 
-        sum_curr_len += queue.size;
+        sum_curr_len += size;
         count_len_beetw_print++;
 
         if (model.count_output == i)
         {
             model.av_len_queue = sum_curr_len / count_len_beetw_print;
-            model.curr_len_queue = queue.size;
+            model.curr_len_queue = size;
             print_intermediate(&model);
             sum_curr_len = 0;
             count_len_beetw_print = 0;
