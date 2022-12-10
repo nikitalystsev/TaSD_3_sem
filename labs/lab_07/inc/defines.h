@@ -23,5 +23,6 @@
 
 #define MIN_DATA 0
 #define MAX_DATA 500
+#define NOT_FOUND 1
 
 #endif

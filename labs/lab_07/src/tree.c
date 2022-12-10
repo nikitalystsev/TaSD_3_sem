@@ -1,12 +1,13 @@
 #include "tree.h"
 
-vertex_t *create_vertex(int data)
+vertex_t *create_vertex(int data, int height)
 {
     vertex_t *vertex = malloc(sizeof(vertex_t));
 
     if (vertex)
     {
         vertex->data = data;
+        vertex->height = height;
         vertex->left = NULL;
         vertex->right = NULL;
     }
@@ -175,7 +176,6 @@ bool is_empty_tree(tree_t *tree)
 {
     if (!tree->root)
     {
-        puts(VIOLET "\nДерево пустое" RESET);
         return true;
     }
 
@@ -197,11 +197,6 @@ void free_tree(tree_t *tree)
 {
     free_vertex(tree->root);
     tree->root = NULL;
-}
-
-int max(int a, int b)
-{
-    return (a > b) ? a : b;
 }
 
 int get_tree_depth(vertex_t *root)
@@ -242,6 +237,70 @@ int get_count_vertex_in_level(vertex_t *root, int n, int c)
     }
 
     return count;
+}
+
+static vertex_t *rotate_left(vertex_t *root)
+{
+    vertex_t *new_root = root->right;
+
+    root->right = new_root->left;
+
+    new_root->left = root;
+
+    return new_root;
+}
+
+static vertex_t *rotate_right(vertex_t *root)
+{
+    vertex_t *new_root = root->left;
+
+    root->left = new_root->right;
+
+    new_root->right = root;
+
+    return new_root;
+}
+
+static int height(vertex_t *vertex)
+{
+    return vertex ? vertex->height : 0;
+}
+
+// получает разницу высот правого и левого поддеревьев
+static int balance_factor(vertex_t *vertex)
+{
+    return height(vertex->right) - height(vertex->left);
+}
+
+static void new_height(vertex_t *vertex)
+{
+    int height_l = height(vertex->left);
+    int height_r = height(vertex->right);
+
+    vertex->height = ((height_l > height_r) ? height_l : height_r) + 1;
+}
+
+vertex_t *balance(vertex_t *root) // балансировка 
+{
+    new_height(root);
+
+    if (balance_factor(root) == 2)
+    {
+        if (balance_factor(root->right) < 0)
+            root->right = rotate_right(root->right);
+
+        return rotate_left(root);
+    }
+
+    if (balance_factor(root) == -2)
+    {
+        if (balance_factor(root->left) > 0)
+            root->left = rotate_left(root->left);
+
+        return rotate_right(root);
+    }
+
+    return root; // балансировка не нужна
 }
 
 void print_tree(vertex_t *root, int p)
