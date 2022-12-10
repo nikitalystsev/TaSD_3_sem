@@ -4,11 +4,19 @@ void vertex_to_dot(vertex_t *vertex, FILE *file)
 {
     if (vertex->left)
     {
+        fprintf(file, "%d [label=\"%d, h = %d\"]", vertex->data,
+                vertex->data, vertex->height);
+        fprintf(file, "%d [label=\"%d, h = %d\"]", vertex->left->data,
+                vertex->left->data, vertex->left->height);
         fprintf(file, "%d -> %d [color=blue];\n", vertex->data,
                 vertex->left->data);
     }
     if (vertex->right)
     {
+        fprintf(file, "%d [label=\"%d, h = %d\"]", vertex->data,
+                vertex->data, vertex->height);
+        fprintf(file, "%d [label=\"%d, h = %d\"]", vertex->right->data,
+                vertex->right->data, vertex->right->height);
         fprintf(file, "%d -> %d [color=red];\n", vertex->data,
                 vertex->right->data);
     }
