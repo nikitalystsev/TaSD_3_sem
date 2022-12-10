@@ -197,6 +197,28 @@ static int add_data(tree_t *tree, tree_t *balance_tree)
     return rc;
 }
 
+static int del_data(tree_t *tree, tree_t *balance_tree)
+{
+    int rc = 0;
+
+    int number;
+
+    if ((rc = read_elem_tree(&number)) != 0)
+        return rc;
+
+    rc = delete_vertex(&tree, number, false);
+    rc += delete_vertex(&balance_tree, number, true);
+
+    if (rc == 0)
+        printf(GREEN "\nЭлемент со значением (%d) "
+                     "был успешно удален!\n" RESET,
+               number);
+    else
+        puts(VIOLET "\nУдаляемого элемента в дереве нет" RESET);
+
+    return rc;
+}
+
 int process(void)
 {
     int rc = 0;
@@ -231,9 +253,12 @@ int process(void)
                 goto free;
             break;
         case 3:
-            if ((rc = add_data(&tree, &balance_tree)) != 0)
+            rc = del_data(&tree, &balance_tree);
+            if ((rc != 0 && rc != 2))
                 goto free;
             break;
+        case 4:
+            
         default:
             break;
         }
