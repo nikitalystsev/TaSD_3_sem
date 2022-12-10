@@ -21,13 +21,13 @@ struct tree_t
 
 vertex_t *create_vertex(int data, int height);
 
-vertex_t *add_vertex(vertex_t *root, vertex_t *vertex);
+vertex_t *add_vertex(vertex_t *root, vertex_t *vertex, bool is_balance);
 
 vertex_t *search(vertex_t *root, int data);
 
 vertex_t *find_parent(vertex_t *root, vertex_t *vertex);
 
-int delete_vertex(vertex_t **root, int data);
+int delete_vertex(vertex_t **root, int data, bool is_balance);
 
 bool is_empty_tree(tree_t *tree);
 

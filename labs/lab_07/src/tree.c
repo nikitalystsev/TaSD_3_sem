@@ -15,7 +15,7 @@ vertex_t *create_vertex(int data, int height)
     return vertex;
 }
 
-vertex_t *add_vertex(vertex_t *root, vertex_t *vertex)
+vertex_t *add_vertex(vertex_t *root, vertex_t *vertex, bool is_balance)
 {
     if (!root)
     {
@@ -24,14 +24,14 @@ vertex_t *add_vertex(vertex_t *root, vertex_t *vertex)
 
     if (vertex->data < root->data)
     {
-        root->left = add_vertex(root->left, vertex);
+        root->left = add_vertex(root->left, vertex, is_balance);
     }
     else if (vertex->data > root->data)
     {
-        root->right = add_vertex(root->right, vertex);
+        root->right = add_vertex(root->right, vertex, is_balance);
     }
 
-    return root;
+    return is_balance ? balance(root) : root;
 }
 
 vertex_t *search(vertex_t *root, int data)
@@ -110,7 +110,7 @@ static vertex_t *find_min_right(vertex_t *vertex)
 //     return tmp_vertex;
 // }
 
-int delete_vertex(vertex_t **root, int data)
+int delete_vertex(vertex_t **root, int data, bool is_balance)
 {
     vertex_t *parent = NULL;
     vertex_t *find = search(*root, data);
@@ -138,7 +138,7 @@ int delete_vertex(vertex_t **root, int data)
 
         // удаляем всех преемников найденного (min_right) элемента
         // и его самого тоже
-        delete_vertex(root, min_right->data);
+        delete_vertex(root, min_right->data, is_balance);
 
         find->data = data;
     }
@@ -167,6 +167,11 @@ int delete_vertex(vertex_t **root, int data)
                 parent->right = heir, find = NULL;
             }
         }
+    }
+
+    if (is_balance)
+    {
+        *root = balance(*root);
     }
 
     return EXIT_SUCCESS;
@@ -219,7 +224,6 @@ int get_tree_depth(vertex_t *root)
 
 int get_count_vertex_in_level(vertex_t *root, int n, int c)
 {
-
     if (n == c)
     {
         return 1;
@@ -247,6 +251,9 @@ static vertex_t *rotate_left(vertex_t *root)
 
     new_root->left = root;
 
+    new_height(new_root);
+    new_height(root);
+
     return new_root;
 }
 
@@ -257,6 +264,9 @@ static vertex_t *rotate_right(vertex_t *root)
     root->left = new_root->right;
 
     new_root->right = root;
+
+    new_height(new_root);
+    new_height(root);
 
     return new_root;
 }
@@ -280,7 +290,7 @@ static void new_height(vertex_t *vertex)
     vertex->height = ((height_l > height_r) ? height_l : height_r) + 1;
 }
 
-vertex_t *balance(vertex_t *root) // балансировка 
+vertex_t *balance(vertex_t *root) // балансировка
 {
     new_height(root);
 
