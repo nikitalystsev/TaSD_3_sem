@@ -3,6 +3,7 @@
 
 #include "defines.h"
 #include "tree.h"
+#include "tree_visual.h"
 #include "print.h"
 #include "gen_data.h"
 

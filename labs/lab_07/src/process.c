@@ -206,8 +206,8 @@ static int del_data(tree_t *tree, tree_t *balance_tree)
     if ((rc = read_elem_tree(&number)) != 0)
         return rc;
 
-    rc = delete_vertex(&tree, number, false);
-    rc += delete_vertex(&balance_tree, number, true);
+    rc = delete_vertex(&tree->root, number, false);
+    rc += delete_vertex(&balance_tree->root, number, true);
 
     if (rc == 0)
         printf(GREEN "\nЭлемент со значением (%d) "
@@ -215,6 +215,36 @@ static int del_data(tree_t *tree, tree_t *balance_tree)
                number);
     else
         puts(VIOLET "\nУдаляемого элемента в дереве нет" RESET);
+
+    return rc;
+}
+
+static int trees_to_dot(tree_t *tree, tree_t *balance_tree)
+{
+    int rc = 0;
+
+    if (is_empty_tree(tree) || is_empty_tree(balance_tree))
+        puts(VIOLET "\nДерево пустое" RESET);
+    else
+    {
+        char data_file[MAX_STR_SIZE] = DATA_DIR;
+        char balance_data_file[MAX_STR_SIZE] = DATA_DIR "balance_";
+
+        char data_gv[MAX_STR_SIZE];
+
+        if ((rc = read_file_name(data_gv)) != 0)
+            return rc;
+
+        strcat(data_file, data_gv);
+        strcat(balance_data_file, data_gv);
+
+        if ((rc = export_to_dot(data_file, "my_tree", tree)) != 0)
+            return rc;
+
+        if ((rc = export_to_dot(balance_data_file, "my_tree",
+                                balance_tree)) != 0)
+            return rc;
+    }
 
     return rc;
 }
@@ -258,7 +288,9 @@ int process(void)
                 goto free;
             break;
         case 4:
-            
+            if ((rc = trees_to_dot(&tree, &balance_tree)) != 0)
+                goto free;
+            break;
         default:
             break;
         }

@@ -11,6 +11,7 @@ VALGRIND := valgrind --track-origins=yes --leak-check=full \
 PREF_SRC := ./src/
 PREF_INC := ./inc/
 PREF_OUT := ./out/
+PREF_DATA := ./data/
 
 SRC := $(wildcard $(PREF_SRC)*.c)
 OUT_OBJ := $(patsubst $(PREF_SRC)%.c, $(PREF_OUT)%.o, $(SRC))
@@ -27,8 +28,6 @@ $(PREF_OUT)%.o : $(PREF_SRC)%.c
 	$(CC) $(CFLAGS) -c -MD $< -o $@
 
 include $(wildcard $(PREF_OUT)*.d)
-
-.PHONY : clean
 
 del_data :
 	rm -Rf $(PREF_DATA)*

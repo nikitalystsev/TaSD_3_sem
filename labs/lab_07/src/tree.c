@@ -290,7 +290,7 @@ static vertex_t *rotate_right(vertex_t *root)
     return new_root;
 }
 
-vertex_t *balance(vertex_t *root) // балансировка
+vertex_t *balance_vertex(vertex_t *root) // балансировка узла
 {
     new_height(root);
 
@@ -311,6 +311,22 @@ vertex_t *balance(vertex_t *root) // балансировка
     }
 
     return root; // балансировка не нужна
+}
+
+
+vertex_t *balance(vertex_t *root)
+{
+    if (root)
+    {
+        if (root->right)
+            root->right = balance(root->right);
+        if (root->left)
+            root->left = balance(root->left);
+
+        root = balance_vertex(root);
+    }
+    
+    return root;
 }
 
 void print_tree(vertex_t *root, int p)
