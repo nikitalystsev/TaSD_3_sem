@@ -15,6 +15,8 @@ PREF_OUT := ./out/
 SRC := $(wildcard $(PREF_SRC)*.c)
 OUT_OBJ := $(patsubst $(PREF_SRC)%.c, $(PREF_OUT)%.o, $(SRC))
 
+.PHONY : run clean del_data
+
 run : app.exe
 	$(VALGRIND) ./app.exe 
 
@@ -28,5 +30,8 @@ include $(wildcard $(PREF_OUT)*.d)
 
 .PHONY : clean
 
+del_data :
+	rm -Rf $(PREF_DATA)*
+	
 clean : 
-	rm -Rf $(PREF_OUT) ./*.exe
+	rm -Rf $(PREF_OUT) ./*.exe ./*.svg ./*.png ./*.gv ./txt

@@ -62,7 +62,7 @@ static bool is_exist_file(const char *file_name)
     return true;
 }
 
-static int read_data(const char *file_name, tree_t *tree, bool is_balance)
+static int read_numbers(const char *file_name, tree_t *tree, bool is_balance)
 {
     int rc = 0;
 
@@ -107,8 +107,7 @@ static int read_data(const char *file_name, tree_t *tree, bool is_balance)
     return rc;
 }
 
-static int read_data_from_file(int *count_data, tree_t *tree,
-                               tree_t *balance_tree)
+static int read_data(int *count_data, tree_t *tree, tree_t *balance_tree)
 {
     char file_name[MAX_STR_SIZE];
     char data_file[MAX_STR_SIZE] = DATA_DIR;
@@ -125,21 +124,75 @@ static int read_data_from_file(int *count_data, tree_t *tree,
     {
         if ((rc = read_count_data(count_data)) != 0)
             return rc;
-            
+
         gen_data_file(data_file, *count_data);
     }
 
     strcpy(data_gv, data_file);
     strcat(data_gv, GV);
 
-    if ((rc = read_data(data_file, tree, false)) != 0)
+    if ((rc = read_numbers(data_file, tree, false)) != 0)
         return rc;
 
-    if ((rc = read_data(data_file, balance_tree, true)) != 0)
+    if ((rc = read_numbers(data_file, balance_tree, true)) != 0)
         return rc;
 
     if (rc == 0)
         puts(GREEN "\nДанные были успешно прочитаны!" RESET);
+
+    return rc;
+}
+
+static int read_elem_tree(int *num)
+{
+    puts(TURQ "\nВведите элемент дерева:" RESET);
+
+    if (scanf("%d", num) != 1)
+    {
+        puts(RED "\nНекорректный ввод элемента дерева!" RESET);
+        return ERR_MENU_ITEM;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+static int add_number(tree_t *tree, int data, int height, bool is_balance)
+{
+    int rc = 0;
+
+    vertex_t *vertex = create_vertex(data, height);
+
+    if (!vertex)
+    {
+        puts(RED "Ошибка добавления данных!\n" RESET);
+        return ERR_READ_DATA;
+    }
+
+    if (is_balance)
+        tree->root = add_vertex(tree->root, vertex, true);
+    else
+        tree->root = add_vertex(tree->root, vertex, false);
+
+    return rc;
+}
+
+static int add_data(tree_t *tree, tree_t *balance_tree)
+{
+    int rc = 0;
+
+    int number, height = 0;
+
+    if ((rc = read_elem_tree(&number)) != 0)
+        return rc;
+
+    if ((rc = add_number(tree, number, height, false)) != 0)
+        return rc;
+
+    if ((rc = add_number(balance_tree, number, height, true)) != 0)
+        return rc;
+
+    if (rc == 0)
+        puts(GREEN "\nДанные были успешно добавлены!" RESET);
 
     return rc;
 }
@@ -170,8 +223,15 @@ int process(void)
             exit(0);
             break;
         case 1:
-            if ((rc = read_data_from_file(&count_data, &tree,
-                                          &balance_tree)) != 0)
+            if ((rc = read_data(&count_data, &tree, &balance_tree)) != 0)
+                goto free;
+            break;
+        case 2:
+            if ((rc = add_data(&tree, &balance_tree)) != 0)
+                goto free;
+            break;
+        case 3:
+            if ((rc = add_data(&tree, &balance_tree)) != 0)
                 goto free;
             break;
         default:
