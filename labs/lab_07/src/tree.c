@@ -243,6 +243,25 @@ int get_count_vertex_in_level(vertex_t *root, int n, int c)
     return count;
 }
 
+static int height(vertex_t *vertex)
+{
+    return vertex ? vertex->height : 0;
+}
+
+// получает разницу высот правого и левого поддеревьев
+static int balance_factor(vertex_t *vertex)
+{
+    return height(vertex->right) - height(vertex->left);
+}
+
+static void new_height(vertex_t *vertex)
+{
+    int height_l = height(vertex->left);
+    int height_r = height(vertex->right);
+
+    vertex->height = ((height_l > height_r) ? height_l : height_r) + 1;
+}
+
 static vertex_t *rotate_left(vertex_t *root)
 {
     vertex_t *new_root = root->right;
@@ -269,25 +288,6 @@ static vertex_t *rotate_right(vertex_t *root)
     new_height(root);
 
     return new_root;
-}
-
-static int height(vertex_t *vertex)
-{
-    return vertex ? vertex->height : 0;
-}
-
-// получает разницу высот правого и левого поддеревьев
-static int balance_factor(vertex_t *vertex)
-{
-    return height(vertex->right) - height(vertex->left);
-}
-
-static void new_height(vertex_t *vertex)
-{
-    int height_l = height(vertex->left);
-    int height_r = height(vertex->right);
-
-    vertex->height = ((height_l > height_r) ? height_l : height_r) + 1;
 }
 
 vertex_t *balance(vertex_t *root) // балансировка

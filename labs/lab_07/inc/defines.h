@@ -24,5 +24,13 @@
 #define MIN_DATA 0
 #define MAX_DATA 500
 #define NOT_FOUND 1
+#define DATA_DIR "./data/"
+#define GV ".gv"
+#define MAX_STR_SIZE 10000
+
+#define ERR_READ_DATA 100
+#define ERR_MENU_ITEM 101
+#define ERR_COUNT_DATA 102
+#define ERR_OPEN_FILE 103
 
 #endif
