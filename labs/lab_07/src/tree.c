@@ -34,8 +34,10 @@ vertex_t *add_vertex(vertex_t *root, vertex_t *vertex, bool is_balance)
     return is_balance ? balance(root) : root;
 }
 
-vertex_t *search(vertex_t *root, int data)
+vertex_t *search(vertex_t *root, int data, int *count_compare)
 {
+    (*count_compare)++;
+
     if (!root)
     {
         return NULL;
@@ -43,15 +45,16 @@ vertex_t *search(vertex_t *root, int data)
 
     if (data < root->data)
     {
-        return search(root->left, data);
+        return search(root->left, data, count_compare);
     }
     if (data > root->data)
     {
-        return search(root->right, data);
+        return search(root->right, data, count_compare);
     }
 
     return root;
 }
+
 
 /*
 Функция для нахождения родителя элемента.
@@ -113,7 +116,9 @@ static vertex_t *find_min_right(vertex_t *vertex)
 int delete_vertex(vertex_t **root, int data, bool is_balance)
 {
     vertex_t *parent = NULL;
-    vertex_t *find = search(*root, data);
+
+    int count_compare = 0;
+    vertex_t *find = search(*root, data, &count_compare);
     if (!find)
     {
         return NOT_FOUND;

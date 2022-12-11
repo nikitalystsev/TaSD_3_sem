@@ -23,7 +23,7 @@ vertex_t *create_vertex(int data, int height);
 
 vertex_t *add_vertex(vertex_t *root, vertex_t *vertex, bool is_balance);
 
-vertex_t *search(vertex_t *root, int data);
+vertex_t *search(vertex_t *root, int data, int *count_compare);
 
 vertex_t *find_parent(vertex_t *root, vertex_t *vertex);
 

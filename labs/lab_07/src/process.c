@@ -109,6 +109,9 @@ static int read_numbers(const char *file_name, tree_t *tree, bool is_balance)
 
 static int read_data(int *count_data, tree_t *tree, tree_t *balance_tree)
 {
+    free_tree(tree);
+    free_tree(balance_tree);
+
     char file_name[MAX_STR_SIZE];
     char data_file[MAX_STR_SIZE] = DATA_DIR;
     char data_gv[MAX_STR_SIZE];
@@ -146,6 +149,19 @@ static int read_data(int *count_data, tree_t *tree, tree_t *balance_tree)
 static int read_elem_tree(int *num)
 {
     puts(TURQ "\nВведите элемент дерева:" RESET);
+
+    if (scanf("%d", num) != 1)
+    {
+        puts(RED "\nНекорректный ввод элемента дерева!" RESET);
+        return ERR_MENU_ITEM;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+static int read_find_elem(int *num)
+{
+    puts(TURQ "\nВведите элемент дерева, который требуется найти:" RESET);
 
     if (scanf("%d", num) != 1)
     {
@@ -249,6 +265,40 @@ static int trees_to_dot(tree_t *tree, tree_t *balance_tree)
     return rc;
 }
 
+static void find_number(tree_t *tree, int number, bool is_balance)
+{
+    int count_compare = 0;
+
+    vertex_t *found_elem = search(tree->root, number, &count_compare);
+
+    if (!found_elem)
+        printf(VIOLET "\nЭлемент со значением (%d) "
+                      "не был найден в бинарном дереве!\n" RESET,
+               number);
+    else
+        printf(GREEN "\nЭлемент со значением (%d) "
+                     "был найден в бинарном дереве!\n" RESET,
+               number);
+    printf("Количество сравнений при поиске в %s "
+           "бинарном дереве поиска = %d\n",
+           is_balance ? "сбалансированном" : "обычном", count_compare);
+}
+
+static int find_data(tree_t *tree, tree_t *balance_tree)
+{
+    int rc = 0;
+
+    int number;
+
+    if ((rc = read_find_elem(&number)) != 0)
+        return rc;
+
+    find_number(tree, number, false);
+    find_number(balance_tree, number, true);
+
+    return rc;
+}
+
 int process(void)
 {
     int rc = 0;
@@ -289,6 +339,10 @@ int process(void)
             break;
         case 4:
             if ((rc = trees_to_dot(&tree, &balance_tree)) != 0)
+                goto free;
+            break;
+        case 5:
+            if ((rc = find_data(&tree, &balance_tree)) != 0)
                 goto free;
             break;
         default:
