@@ -43,6 +43,8 @@ vertex_t *balance_vertex(vertex_t *root);
 
 vertex_t *balance(vertex_t *root);
 
+int get_count_vertex(vertex_t *root);
+
 void print_tree(vertex_t *root, int p);
 
 #endif

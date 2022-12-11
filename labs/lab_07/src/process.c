@@ -265,36 +265,88 @@ static int trees_to_dot(tree_t *tree, tree_t *balance_tree)
     return rc;
 }
 
-static void find_number(tree_t *tree, int number, bool is_balance)
+static bool find_number(tree_t *tree, int number, int *count_compare)
 {
-    int count_compare = 0;
+    vertex_t *found_elem = search(tree->root, number, count_compare);
 
-    vertex_t *found_elem = search(tree->root, number, &count_compare);
+    if (found_elem)
+        return true;
 
-    if (!found_elem)
-        printf(VIOLET "\nЭлемент со значением (%d) "
-                      "не был найден в бинарном дереве!\n" RESET,
-               number);
-    else
-        printf(GREEN "\nЭлемент со значением (%d) "
-                     "был найден в бинарном дереве!\n" RESET,
-               number);
-    printf("Количество сравнений при поиске в %s "
-           "бинарном дереве поиска = %d\n",
-           is_balance ? "сбалансированном" : "обычном", count_compare);
+    return false;
+}
+
+static int tree_size(tree_t *tree)
+{
+    int count_vertex = get_count_vertex(tree->root);
+
+    int size = 0;
+
+    size += sizeof(int);
+    size += sizeof(int);
+    size += sizeof(vertex_t *);
+    size += sizeof(vertex_t *);
+
+    size *= count_vertex;
+
+    return size;
 }
 
 static int find_data(tree_t *tree, tree_t *balance_tree)
 {
     int rc = 0;
 
-    int number;
+    int number, count_cmp = 0, count_cmp_balance = 0;
 
     if ((rc = read_find_elem(&number)) != 0)
         return rc;
 
-    find_number(tree, number, false);
-    find_number(balance_tree, number, true);
+    bool find, find_balance;
+    long double beg, end1 = 0, end2 = 0;
+
+    for (int i = 0; i < N_REPS; i++)
+    {
+        beg = microseconds_now();
+        find = find_number(tree, number, &count_cmp);
+        end1 += microseconds_now() - beg;
+
+        beg = microseconds_now();
+        find_balance = find_number(balance_tree, number, &count_cmp_balance);
+        end2 += microseconds_now() - beg;
+
+        if (i == 0)
+        {
+            if (find && find_balance)
+                printf(GREEN "\nЭлемент со значением (%d) "
+                             "был найден в бинарном дереве!\n" RESET,
+                       number);
+            else
+                printf(VIOLET "\nЭлемент со значением (%d) "
+                              "не был найден в бинарном дереве!\n" RESET,
+                       number);
+            printf(YELLOW "\nКоличество сравнений при поиске в "
+                          "обычном бинарном дереве поиска = %d\n",
+                   count_cmp);
+            printf(YELLOW "\nКоличество сравнений при поиске в "
+                          "сбалансированном бинарном дереве поиска = %d\n",
+                   count_cmp_balance);
+        }
+    }
+
+    printf(YELLOW "\nВремя поиска в обычном "
+                  "бинарном дереве (мкс) = %Lf\n" RESET,
+           end1 / N_REPS);
+    printf(YELLOW "\nВремя поиска в сбалансированном "
+                  "бинарном дереве (мкс) = %Lf\n" RESET,
+           end2 / N_REPS);
+
+    int size = tree_size(tree), size_balance = tree_size(balance_tree);
+
+    printf(YELLOW "\nТреуемое количество памяти (байты) "
+                  "для хранения обычного дерева = %d\n" RESET,
+           size);
+    printf(YELLOW "\nТреуемое количество памяти (байты) "
+                  "для хранения сбалансированного дерева = %d\n" RESET,
+           size_balance);
 
     return rc;
 }

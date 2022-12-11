@@ -6,6 +6,7 @@
 #include "tree_visual.h"
 #include "print.h"
 #include "gen_data.h"
+#include "timing.h"
 
 int process(void);
 

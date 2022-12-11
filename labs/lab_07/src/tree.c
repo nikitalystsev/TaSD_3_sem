@@ -55,7 +55,6 @@ vertex_t *search(vertex_t *root, int data, int *count_compare)
     return root;
 }
 
-
 /*
 Функция для нахождения родителя элемента.
 Случай, когда элементом является корень, не обрабатывается
@@ -318,7 +317,6 @@ vertex_t *balance_vertex(vertex_t *root) // балансировка узла
     return root; // балансировка не нужна
 }
 
-
 vertex_t *balance(vertex_t *root)
 {
     if (root)
@@ -330,8 +328,19 @@ vertex_t *balance(vertex_t *root)
 
         root = balance_vertex(root);
     }
-    
+
     return root;
+}
+
+int get_count_vertex(vertex_t *root)
+{
+    if (!root)
+        return 0;
+
+    int l = get_count_vertex(root->left);
+    int r = get_count_vertex(root->right);
+
+    return 1 + l + r;
 }
 
 void print_tree(vertex_t *root, int p)
