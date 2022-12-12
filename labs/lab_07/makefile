@@ -19,7 +19,7 @@ OUT_OBJ := $(patsubst $(PREF_SRC)%.c, $(PREF_OUT)%.o, $(SRC))
 .PHONY : run clean del_data
 
 run : app.exe
-	$(VALGRIND) ./app.exe 
+	./app.exe 
 
 app.exe : $(OUT_OBJ)
 	$(CC) $(OUT_OBJ) -o app.exe 

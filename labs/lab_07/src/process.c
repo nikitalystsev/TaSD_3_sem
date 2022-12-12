@@ -338,58 +338,64 @@ static int find_data(tree_t *tree, tree_t *balance_tree)
 {
     int rc = 0;
 
-    int number, count_cmp = 0, count_cmp_balance = 0;
-
-    if ((rc = read_find_elem(&number)) != 0)
-        return rc;
-
-    bool find, find_balance;
-    long double beg, end1 = 0, end2 = 0;
-
-    for (int i = 0; i < N_REPS; i++)
+    if (!is_empty_tree(tree) && !is_empty_tree(balance_tree))
     {
-        beg = microseconds_now();
-        find = find_number(tree, number, &count_cmp);
-        end1 += microseconds_now() - beg;
+        int number, count_cmp = 0, count_cmp_balance = 0;
 
-        beg = microseconds_now();
-        find_balance = find_number(balance_tree, number, &count_cmp_balance);
-        end2 += microseconds_now() - beg;
+        if ((rc = read_find_elem(&number)) != 0)
+            return rc;
 
-        if (i == 0)
+        bool find, find_balance;
+        long double beg, end1 = 0, end2 = 0;
+
+        for (int i = 0; i < N_REPS; i++)
         {
-            if (find && find_balance)
-                printf(GREEN "\nЭлемент со значением (%d) "
-                             "был найден в бинарном дереве!\n" RESET,
-                       number);
-            else
-                printf(VIOLET "\nЭлемент со значением (%d) "
-                              "не был найден в бинарном дереве!\n" RESET,
-                       number);
-            printf(YELLOW "\nКоличество сравнений при поиске в "
-                          "обычном бинарном дереве поиска = %d\n",
-                   count_cmp);
-            printf(YELLOW "\nКоличество сравнений при поиске в "
-                          "сбалансированном бинарном дереве поиска = %d\n",
-                   count_cmp_balance);
+            beg = microseconds_now();
+            find = find_number(tree, number, &count_cmp);
+            end1 += microseconds_now() - beg;
+
+            beg = microseconds_now();
+            find_balance = find_number(balance_tree, number,
+                                       &count_cmp_balance);
+            end2 += microseconds_now() - beg;
+
+            if (i == 0)
+            {
+                if (find && find_balance)
+                    printf(GREEN "\nЭлемент со значением (%d) "
+                                 "был найден в бинарном дереве!\n" RESET,
+                           number);
+                else
+                    printf(VIOLET "\nЭлемент со значением (%d) "
+                                  "не был найден в бинарном дереве!\n" RESET,
+                           number);
+                printf(YELLOW "\nКоличество сравнений при поиске в "
+                              "обычном бинарном дереве поиска = %d\n",
+                       count_cmp);
+                printf(YELLOW "\nКоличество сравнений при поиске в "
+                              "сбалансированном бинарном дереве поиска = %d\n",
+                       count_cmp_balance);
+            }
         }
+
+        printf(YELLOW "\nВремя поиска в обычном "
+                      "бинарном дереве (мкс) = %Lf\n" RESET,
+               end1 / N_REPS);
+        printf(YELLOW "\nВремя поиска в сбалансированном "
+                      "бинарном дереве (мкс) = %Lf\n" RESET,
+               end2 / N_REPS);
+
+        int size = tree_size(tree), size_balance = tree_size(balance_tree);
+
+        printf(YELLOW "\nТреуемое количество памяти (байты) "
+                      "для хранения обычного дерева = %d\n" RESET,
+               size);
+        printf(YELLOW "\nТреуемое количество памяти (байты) "
+                      "для хранения сбалансированного дерева = %d\n" RESET,
+               size_balance);
     }
-
-    printf(YELLOW "\nВремя поиска в обычном "
-                  "бинарном дереве (мкс) = %Lf\n" RESET,
-           end1 / N_REPS);
-    printf(YELLOW "\nВремя поиска в сбалансированном "
-                  "бинарном дереве (мкс) = %Lf\n" RESET,
-           end2 / N_REPS);
-
-    int size = tree_size(tree), size_balance = tree_size(balance_tree);
-
-    printf(YELLOW "\nТреуемое количество памяти (байты) "
-                  "для хранения обычного дерева = %d\n" RESET,
-           size);
-    printf(YELLOW "\nТреуемое количество памяти (байты) "
-                  "для хранения сбалансированного дерева = %d\n" RESET,
-           size_balance);
+    else
+        puts(VIOLET "\nДерево пустое" RESET);
 
     return rc;
 }
@@ -659,6 +665,9 @@ static int change_hash_func(hash_func_t *hash_func, hash_table_t *table)
     else if (menu_item == 2)
         *hash_func = other_hash;
 
+    if (rc == 0)
+        puts(GREEN "\nХеш-функция успешно изменена!" RESET);
+
     return rc;
 }
 
@@ -692,6 +701,9 @@ static int add_hash_data(hash_table_t *table, hash_func_t hash_func)
         }
         else
             table->data[hash_n].collision++;
+
+        if (rc == 0)
+            puts(GREEN "\nДанные были успешно добавлены!" RESET);
     }
     else
         puts(VIOLET "\nЧтобы иметь возможность добавлять данные вручную, "
@@ -710,7 +722,7 @@ int process(void)
     hash_table_t table;
     table.data = NULL, table.size = 0;
 
-    hash_func_t hash_func = hash;
+    hash_func_t hash_func = other_hash;
 
     int count_data;
 
