@@ -351,12 +351,129 @@ static int find_data(tree_t *tree, tree_t *balance_tree)
     return rc;
 }
 
+static int read_hash_numbers(char *file_name, hash_table_t *table)
+{
+    int rc = 0;
+
+    FILE *file = fopen(file_name, "r");
+    if (!file)
+    {
+        puts(RED "\nОшибка открытия файла!\n" RESET);
+        return ERR_OPEN_FILE;
+    }
+
+    int count, data;
+
+    if (fscanf(file, "%d", &count) != 1)
+    {
+        fclose(file), puts(RED "\nОшибка чтения данных из файла!" RESET);
+        return ERR_READ_DATA;
+    }
+
+    table->size = count;
+
+    if ((rc = create_hash_table(table)) != 0)
+    {
+        puts(RED "\nОшибка выделения памяти!\n" RESET);
+        return ERR_MEM_ALLOC;
+    }
+    default_hash_table(table);
+
+    for (int i = 0; i < count; i++)
+    {
+        if (fscanf(file, "%d", &data) != 1)
+        {
+            fclose(file), puts(RED "\nОшибка чтения данных из файла!" RESET);
+            return ERR_READ_DATA;
+        }
+
+        int hash_n = hash(data, count);
+
+        data_t *node = create_data(data);
+
+        if (!node)
+        {
+            puts(RED "\nОшибка выделения памяти!\n" RESET);
+            fclose(file);
+            return ERR_MEM_ALLOC;
+        }
+
+        table->data[hash_n].head = push_front(table->data[hash_n].head, node);
+
+        if (!table->data[hash_n].is_full)
+        {
+            table->data[hash_n].is_full = true;
+            table->data[hash_n].hash = hash_n;
+        }
+        else
+            table->data[hash_n].collision++;
+    }
+
+    fclose(file);
+
+    return rc;
+}
+
+static int make_hash_table(int *count_data, hash_table_t *table)
+{
+    char file_name[MAX_STR_SIZE];
+    char data_file[MAX_STR_SIZE] = DATA_DIR;
+    char data_gv[MAX_STR_SIZE];
+
+    int rc = 0;
+
+    if ((rc = read_file_name(file_name)) != 0)
+        return rc;
+
+    strcat(data_file, file_name);
+
+    if (!is_exist_file(data_file))
+    {
+        if ((rc = read_count_data(count_data)) != 0)
+            return rc;
+
+        gen_data_file(data_file, *count_data);
+    }
+
+    strcpy(data_gv, data_file);
+    strcat(data_gv, GV);
+
+    if ((rc = read_hash_numbers(data_file, table)) != 0)
+        return rc;
+
+    if (rc == 0)
+        puts(GREEN "\nДанные были успешно прочитаны!" RESET);
+
+    return rc;
+}
+
+static int get_count_collisions(hash_table_t *table)
+{
+    int count_collisions = 0;
+
+    for (int i = 0; i < table->size; i++)
+        count_collisions += table->data[i].collision;
+
+    return count_collisions;
+}
+
+void print_table(hash_table_t *table)
+{
+    int count_collisions = get_count_collisions(table);
+
+    printf(YELLOW "\nОбщее количество коллизий = %d\n" RESET, count_collisions);
+
+    print_hash_table(table);
+}
+
 int process(void)
 {
     int rc = 0;
 
     tree_t tree, balance_tree;
     tree.root = NULL, balance_tree.root = NULL;
+
+    hash_table_t table;
 
     int count_data;
 
@@ -372,6 +489,7 @@ int process(void)
         switch (menu_item)
         {
         case 0:
+            free_table(&table);
             free_tree(&tree);
             free_tree(&balance_tree);
             exit(0);
@@ -397,12 +515,20 @@ int process(void)
             if ((rc = find_data(&tree, &balance_tree)) != 0)
                 goto free;
             break;
+        case 6:
+            if ((rc = make_hash_table(&count_data, &table)) != 0)
+                goto free;
+            break;
+        case 8:
+            print_table(&table);
+            break;
         default:
             break;
         }
     }
 
 free:
+    free_table(&table);
     free_tree(&tree);
     free_tree(&balance_tree);
 

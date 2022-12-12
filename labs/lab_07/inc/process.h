@@ -4,6 +4,7 @@
 #include "defines.h"
 #include "tree.h"
 #include "tree_visual.h"
+#include "hash.h"
 #include "print.h"
 #include "gen_data.h"
 #include "timing.h"
