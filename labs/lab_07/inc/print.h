@@ -5,4 +5,6 @@
 
 void print_menu(void);
 
+void print_choice_hash_func(void);
+
 #endif

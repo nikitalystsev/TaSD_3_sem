@@ -21,7 +21,7 @@ static int read_menu_item(int *item)
         return ERR_MENU_ITEM;
     }
 
-    if (*item < 0 || *item > 9)
+    if (*item < 0 || *item > 10)
     {
         puts(RED "\nНеверный номер пункта меню!" RESET);
         return ERR_MENU_ITEM;
@@ -45,6 +45,19 @@ static int read_count_data(int *count_data)
         puts(RED "\nНеверный ввод! "
                  "Количество генерируемых данных - число больше нуля!" RESET);
         return ERR_COUNT_DATA;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+static int read_count_cmp(int *count_cmp)
+{
+    puts(TURQ "\nВведите количество допустимых сравнений:" RESET);
+
+    if (scanf("%d", count_cmp) != 1)
+    {
+        puts(RED "\nНекорректный ввод количество допустимых сравнений!" RESET);
+        return ERR_MENU_ITEM;
     }
 
     return EXIT_SUCCESS;
@@ -159,13 +172,43 @@ static int read_elem_tree(int *num)
     return EXIT_SUCCESS;
 }
 
+static int read_hash_elem(int *num)
+{
+    puts(TURQ "\nВведите элемент хеш-таблицы:" RESET);
+
+    if (scanf("%d", num) != 1)
+    {
+        puts(RED "\nНекорректный ввод элемента хеш-таблицы!" RESET);
+        return ERR_MENU_ITEM;
+    }
+
+    return EXIT_SUCCESS;
+}
+
 static int read_find_elem(int *num)
 {
-    puts(TURQ "\nВведите элемент дерева, который требуется найти:" RESET);
+    puts(TURQ "\nВведите элемент, который требуется найти:" RESET);
 
     if (scanf("%d", num) != 1)
     {
         puts(RED "\nНекорректный ввод элемента дерева!" RESET);
+        return ERR_MENU_ITEM;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+static int read_choise_hash_func(int *item)
+{
+    if (scanf("%d", item) != 1)
+    {
+        puts(RED "\nНекорректный ввод номера хеш-функции!" RESET);
+        return ERR_MENU_ITEM;
+    }
+
+    if (*item < 1 || *item > 2)
+    {
+        puts(RED "\nНеверный ввод номера хеш-функции!" RESET);
         return ERR_MENU_ITEM;
     }
 
@@ -351,7 +394,16 @@ static int find_data(tree_t *tree, tree_t *balance_tree)
     return rc;
 }
 
-static int read_hash_numbers(char *file_name, hash_table_t *table)
+static bool is_empty_hash_table(hash_table_t *table)
+{
+    if (!table->data)
+        return true;
+
+    return false;
+}
+
+static int read_hash_numbers(char *file_name, hash_table_t *table,
+                             hash_func_t hash)
 {
     int rc = 0;
 
@@ -387,7 +439,7 @@ static int read_hash_numbers(char *file_name, hash_table_t *table)
             return ERR_READ_DATA;
         }
 
-        int hash_n = other_hash(data, count);
+        int hash_n = hash(data, count);
 
         data_t *node = create_data(data);
 
@@ -414,7 +466,7 @@ static int read_hash_numbers(char *file_name, hash_table_t *table)
     return rc;
 }
 
-static int make_hash_table(int *count_data, hash_table_t *table)
+static int make_hash_table(int *count_data, hash_table_t *table, hash_func_t hash)
 {
     char file_name[MAX_STR_SIZE];
     char data_file[MAX_STR_SIZE] = DATA_DIR;
@@ -438,7 +490,7 @@ static int make_hash_table(int *count_data, hash_table_t *table)
     strcpy(data_gv, data_file);
     strcat(data_gv, GV);
 
-    if ((rc = read_hash_numbers(data_file, table)) != 0)
+    if ((rc = read_hash_numbers(data_file, table, hash)) != 0)
         return rc;
 
     if (rc == 0)
@@ -459,55 +511,191 @@ static int get_count_collisions(hash_table_t *table)
 
 static void print_table(hash_table_t *table)
 {
-    int count_collisions = get_count_collisions(table);
+    if (!is_empty_hash_table(table))
+    {
+        int count_collisions = get_count_collisions(table);
 
-    printf(YELLOW "\nОбщее количество коллизий = %d\n" RESET,
-           count_collisions);
+        printf(YELLOW "\nОбщее количество коллизий = %d\n" RESET,
+               count_collisions);
 
-    print_hash_table(table);
+        print_hash_table(table);
+    }
+    else
+        puts(VIOLET "\nХеш-таблица пустая" RESET);
 }
 
-static void find_hash_number(hash_table_t *table, int data)
+static int find_hash_number(hash_table_t *table, int data,
+                            hash_func_t hash, bool *is_find)
 {
-    int hash_n = other_hash(data, table->size);
+    int hash_n = hash(data, table->size);
 
     int count_compare = 0;
 
     data_t *tmp_head = table->data[hash_n].head;
 
-    bool is_find = false;
+    *is_find = false;
 
     while (tmp_head)
     {
         count_compare++;
         if (tmp_head->data == data)
-            printf(GREEN "\nЭлемент со значением (%d) "
-                         "был найден в хеш-таблице!\n" RESET,
-                   data),
-                is_find = true;
+            *is_find = true;
         tmp_head = tmp_head->next;
     }
 
-    if (!is_find)
-        printf(GREEN "\nЭлемент со значением (%d) "
-                     "не был найден в хеш-таблице!\n" RESET,
-               data);
-
-    printf(YELLOW "\nКоличество сравнений при поиске в "
-                          "хеш-таблице = %d\n",
-                   count_compare);
+    return count_compare;
 }
 
-static int find_hash_data(hash_table_t *table)
+static int size_list(data_t *head)
+{
+    int size = 0;
+
+    data_t *tmp_head = head;
+
+    while (tmp_head)
+    {
+        size += sizeof(int);
+        size += sizeof(data_t *);
+        tmp_head = tmp_head->next;
+    }
+
+    return size;
+}
+
+static int hash_table_size(hash_table_t *table)
+{
+    int size = 0;
+
+    size += sizeof(int);
+    size += (sizeof(hash_t) * table->size);
+
+    for (int i = 0; i < table->size; i++)
+        size += size_list(table->data[i].head);
+
+    return size;
+}
+
+static int find_hash_data(hash_table_t *table, hash_func_t hash)
 {
     int rc = 0;
 
-    int number;
+    if (!is_empty_hash_table(table))
+    {
+        int number, count_cmp;
 
-    if ((rc = read_find_elem(&number)) != 0)
+        if ((rc = read_find_elem(&number)) != 0)
+            return rc;
+
+        if ((rc = read_count_cmp(&count_cmp)) != 0)
+            return rc;
+
+        bool is_find = false;
+
+        long double beg, end = 0;
+
+        int real_count_cmp;
+
+        for (int i = 0; i < N_REPS; i++)
+        {
+            beg = microseconds_now();
+            real_count_cmp = find_hash_number(table, number, hash, &is_find);
+            end += microseconds_now() - beg;
+        }
+
+        if (!is_find)
+            printf(VIOLET "\nЭлемент со значением (%d) "
+                          "не был найден в хеш-таблице!\n" RESET,
+                   number);
+        else
+            printf(GREEN "\nЭлемент со значением (%d) "
+                         "был найден в хеш-таблице!\n" RESET,
+                   number);
+
+        printf(YELLOW "\nКоличество сравнений при поиске в "
+                      "хеш-таблице = %d\n" RESET,
+               real_count_cmp);
+
+        printf(YELLOW "\nВремя поиска в хеш-таблице (мкс) = %Lf\n" RESET,
+               end / N_REPS);
+
+        int size = hash_table_size(table);
+
+        printf(YELLOW "\nТреуемое количество памяти (байты) "
+                      "для хранения хеш-таблицы = %d\n" RESET,
+               size);
+
+        if (real_count_cmp > count_cmp)
+        {
+            puts(VIOLET "\nКоличество сравнений при поиске числа "
+                        "превысило максимально допустимое "
+                        "количество сравнений" RESET);
+            puts(VIOLET "\nНеобходима реструктуризация хеш таблицы" RESET);
+            puts(TURQ "\nВыберите пункт меню "
+                      "смены хеш функции (номер 9)" RESET);
+        }
+    }
+    else
+        puts(VIOLET "\nХеш-таблица пустая" RESET);
+
+    return rc;
+}
+
+static int change_hash_func(hash_func_t *hash_func, hash_table_t *table)
+{
+    free_table(table);
+    table->data = NULL, table->size = 0;
+
+    int rc = 0;
+
+    print_choice_hash_func();
+
+    int menu_item;
+
+    if ((rc = read_choise_hash_func(&menu_item)) != 0)
         return rc;
 
-    find_hash_number(table, number);
+    if (menu_item == 1)
+        *hash_func = hash;
+    else if (menu_item == 2)
+        *hash_func = other_hash;
+
+    return rc;
+}
+
+static int add_hash_data(hash_table_t *table, hash_func_t hash_func)
+{
+    int rc = 0;
+
+    if (!is_empty_hash_table(table))
+    {
+        int data;
+
+        if ((rc = read_hash_elem(&data)) != 0)
+            return rc;
+
+        int hash_n = hash_func(data, table->size);
+
+        data_t *node = create_data(data);
+
+        if (!node)
+        {
+            puts(RED "\nОшибка выделения памяти!\n" RESET);
+            return ERR_MEM_ALLOC;
+        }
+
+        table->data[hash_n].head = push_front(table->data[hash_n].head, node);
+
+        if (!table->data[hash_n].is_full)
+        {
+            table->data[hash_n].is_full = true;
+            table->data[hash_n].hash = hash_n;
+        }
+        else
+            table->data[hash_n].collision++;
+    }
+    else
+        puts(VIOLET "\nЧтобы иметь возможность добавлять данные вручную, "
+                    "воспользуйтесь пунктом меню 6" RESET);
 
     return rc;
 }
@@ -520,7 +708,9 @@ int process(void)
     tree.root = NULL, balance_tree.root = NULL;
 
     hash_table_t table;
-    table.data = NULL;
+    table.data = NULL, table.size = 0;
+
+    hash_func_t hash_func = other_hash;
 
     int count_data;
 
@@ -563,14 +753,22 @@ int process(void)
                 goto free;
             break;
         case 6:
-            if ((rc = make_hash_table(&count_data, &table)) != 0)
+            if ((rc = make_hash_table(&count_data, &table, hash_func)) != 0)
                 goto free;
             break;
-        case 8:
+        case 7:
             print_table(&table);
             break;
+        case 8:
+            if ((rc = find_hash_data(&table, hash_func)) != 0)
+                goto free;
+            break;
         case 9:
-            if ((rc = find_hash_data(&table)) != 0)
+            if ((rc = change_hash_func(&hash_func, &table)) != 0)
+                goto free;
+            break;
+        case 10:
+            if ((rc = add_hash_data(&table, hash_func)) != 0)
                 goto free;
             break;
         default:

@@ -3,6 +3,7 @@
 
 #include "defines.h"
 
+typedef int (*hash_func_t)(int, int);
 typedef struct hash_t hash_t;
 typedef struct data_t data_t;
 typedef struct hash_table_t hash_table_t;
