@@ -27,7 +27,7 @@
 #define DATA_DIR "./data/"
 #define GV ".gv"
 #define MAX_STR_SIZE 10000
-#define N_REPS 100
+#define N_REPS 1000
 
 #define ERR_READ_DATA 100
 #define ERR_MENU_ITEM 101

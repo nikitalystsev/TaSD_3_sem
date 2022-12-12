@@ -710,7 +710,7 @@ int process(void)
     hash_table_t table;
     table.data = NULL, table.size = 0;
 
-    hash_func_t hash_func = other_hash;
+    hash_func_t hash_func = hash;
 
     int count_data;
 
