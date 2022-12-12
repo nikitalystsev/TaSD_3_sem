@@ -33,5 +33,6 @@
 #define ERR_MENU_ITEM 101
 #define ERR_COUNT_DATA 102
 #define ERR_OPEN_FILE 103
+#define ERR_MEM_ALLOC 104
 
 #endif
