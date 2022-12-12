@@ -457,13 +457,59 @@ static int get_count_collisions(hash_table_t *table)
     return count_collisions;
 }
 
-void print_table(hash_table_t *table)
+static void print_table(hash_table_t *table)
 {
     int count_collisions = get_count_collisions(table);
 
-    printf(YELLOW "\nОбщее количество коллизий = %d\n" RESET, count_collisions);
+    printf(YELLOW "\nОбщее количество коллизий = %d\n" RESET,
+           count_collisions);
 
     print_hash_table(table);
+}
+
+static void find_hash_number(hash_table_t *table, int data)
+{
+    int hash_n = hash(data, table->size);
+
+    int count_compare = 0;
+
+    data_t *tmp_head = table->data[hash_n].head;
+
+    bool is_find = false;
+
+    while (tmp_head)
+    {
+        count_compare++;
+        if (tmp_head->data == data)
+            printf(GREEN "\nЭлемент со значением (%d) "
+                         "был найден в хеш-таблице!\n" RESET,
+                   data),
+                is_find = true;
+        tmp_head = tmp_head->next;
+    }
+
+    if (!is_find)
+        printf(GREEN "\nЭлемент со значением (%d) "
+                     "не был найден в хеш-таблице!\n" RESET,
+               data);
+
+    printf(YELLOW "\nКоличество сравнений при поиске в "
+                          "хеш-таблице = %d\n",
+                   count_compare);
+}
+
+static int find_hash_data(hash_table_t *table)
+{
+    int rc = 0;
+
+    int number;
+
+    if ((rc = read_find_elem(&number)) != 0)
+        return rc;
+
+    find_hash_number(table, number);
+
+    return rc;
 }
 
 int process(void)
@@ -474,6 +520,7 @@ int process(void)
     tree.root = NULL, balance_tree.root = NULL;
 
     hash_table_t table;
+    table.data = NULL;
 
     int count_data;
 
@@ -521,6 +568,10 @@ int process(void)
             break;
         case 8:
             print_table(&table);
+            break;
+        case 9:
+            if ((rc = find_hash_data(&table)) != 0)
+                goto free;
             break;
         default:
             break;
