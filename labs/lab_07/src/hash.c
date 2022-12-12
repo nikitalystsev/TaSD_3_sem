@@ -5,6 +5,19 @@ int hash(int data, int size)
     return abs(data) % size;
 }
 
+int other_hash(int data, int size)
+{
+    int sum_digit = 0;
+
+    while (data)
+    {
+        sum_digit += data % 10;
+        data /= 10;
+    }
+
+    return sum_digit % size;
+}
+
 data_t *create_data(int data)
 {
     data_t *node = malloc(sizeof(data_t));

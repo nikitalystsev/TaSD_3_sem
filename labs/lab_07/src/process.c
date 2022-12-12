@@ -387,7 +387,7 @@ static int read_hash_numbers(char *file_name, hash_table_t *table)
             return ERR_READ_DATA;
         }
 
-        int hash_n = hash(data, count);
+        int hash_n = other_hash(data, count);
 
         data_t *node = create_data(data);
 
@@ -469,7 +469,7 @@ static void print_table(hash_table_t *table)
 
 static void find_hash_number(hash_table_t *table, int data)
 {
-    int hash_n = hash(data, table->size);
+    int hash_n = other_hash(data, table->size);
 
     int count_compare = 0;
 

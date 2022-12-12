@@ -29,6 +29,8 @@ struct hash_table_t
 
 int hash(int data, int size);
 
+int other_hash(int data, int size);
+
 data_t *create_data(int data);
 
 data_t *push_front(data_t *head, data_t *node);
