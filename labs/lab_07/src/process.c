@@ -544,11 +544,15 @@ static int find_hash_number(hash_table_t *table, int data,
     while (tmp_head)
     {
         count_compare++;
+
         if (tmp_head->data == data)
+        {
             *is_find = true;
+            break;
+        }
+
         tmp_head = tmp_head->next;
     }
-
     return count_compare;
 }
 
