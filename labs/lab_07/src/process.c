@@ -553,6 +553,7 @@ static int find_hash_number(hash_table_t *table, int data,
 
         tmp_head = tmp_head->next;
     }
+    
     return count_compare;
 }
 
