@@ -21,8 +21,4 @@
 #define TURQ "\033[0;36m" // бирюзовый
 #define WHITE "\033[0;37m"
 
-#define MIN_DATA 0
-#define MAX_DATA 500
-#define NOT_FOUND 1
-
 #endif
