@@ -23,6 +23,7 @@
 
 #define MAX_STR_SIZE 10000
 
-#define ERR_OPEN_FILE 100
+#define ERR_MEM_ALLOC 100
+#define ERR_OPEN_FILE 101
 
 #endif

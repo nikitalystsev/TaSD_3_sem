@@ -26,6 +26,15 @@ struct vertex_t
 struct graph_t
 {
     vertex_t *data; // массив  вершин
+    int size;       // размер массива - количество вершин
 };
+
+adj_list_t *create_node(int number);
+
+int create_graph(graph_t *graph);
+
+void free_agj_list(adj_list_t *head);
+
+void free_graph(graph_t *graph);
 
 #endif
