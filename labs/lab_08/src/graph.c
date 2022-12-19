@@ -7,6 +7,7 @@ adj_list_t *create_node(int number)
     if (node)
     {
         node->number = number;
+        node->is_del = false;
         node->next = NULL;
     }
 
@@ -44,6 +45,7 @@ void default_graph(graph_t *graph)
     {
         graph->data[i].head = NULL;
         graph->data[i].is_visited = false;
+        graph->data[i].is_del = false;
     }
 }
 

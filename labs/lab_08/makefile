@@ -30,7 +30,7 @@ include $(wildcard $(PREF_OUT)*.d)
 .PHONY : clean del_data
 
 del_data : 
-	rm -Rf $(PREF_DATA)*
+	rm -Rf $(PREF_DATA)*.png $(PREF_DATA)*.gv
 	
 clean : 
 	rm -Rf $(PREF_OUT) ./*.exe

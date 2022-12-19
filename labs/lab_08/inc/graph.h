@@ -10,7 +10,8 @@ typedef struct adj_list_t adj_list_t;
 /// @brief список смежности
 struct adj_list_t
 {
-    int number; // номер вершины
+    int number;  // номер вершины
+    bool is_del; // удалена ли
     adj_list_t *next;
 };
 
@@ -20,6 +21,7 @@ struct vertex_t
     int number;       // номер вершины
     int degree;       // степень вершины
     bool is_visited;  // пройдена ли
+    bool is_del;      // удалена ли
     adj_list_t *head; // список смежности данной вершины
 };
 

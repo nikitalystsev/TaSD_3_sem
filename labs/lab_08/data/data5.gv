@@ -1,8 +1,0 @@
-digraph my_graph {
-1 -> 2 [color=blue];
-2 -> 1 [color=blue];
-2 -> 3 [color=blue];
-3 -> 2 [color=blue];
-4 -> 5 [color=blue];
-5 -> 4 [color=blue];
-}
