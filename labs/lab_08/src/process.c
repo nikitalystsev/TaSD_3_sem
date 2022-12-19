@@ -229,12 +229,57 @@ static void clean_is_visited(graph_t *graph)
         graph->data[i].is_visited = false;
 }
 
+static int size_list(adj_list_t *head)
+{
+    int size = 0;
+
+    adj_list_t *tmp_head = head;
+
+    while (tmp_head)
+    {
+        size += sizeof(int);
+        size += sizeof(bool);
+        size += sizeof(adj_list_t *);
+
+        tmp_head = tmp_head->next;
+    }
+
+    return size;
+}
+
+static int vertex_size(vertex_t *vertex)
+{
+    int size = 0;
+
+    size += (2 * sizeof(vertex->number));
+    size += (2 * sizeof(vertex->is_del));
+    size += sizeof(adj_list_t *);
+
+    return size;
+}
+
+static int graph_size(graph_t *graph)
+{
+    int size = 0;
+
+    size += (graph->size * vertex_size(&graph->data[0]));
+
+    for (int i = 0; i < graph->size; i++)
+        size += size_list(graph->data[i].head);
+
+    return size;
+}
+
 static int perform_a_check(graph_t *graph)
 {
     int rc = 0;
 
+    long double beg, end;
+
     if (!is_empty_graph(graph))
     {
+        beg = microseconds_now();
+
         for (int i = 0; i < graph->size; i++)
         {
             conditional_del_vertex(graph, i + 1);
@@ -260,6 +305,16 @@ static int perform_a_check(graph_t *graph)
                        i + 1);
             recov_vertex(graph, i + 1);
         }
+
+        end = microseconds_now() - beg;
+
+        printf(YELLOW "\nВремя работы программы (мкс) = %LF\n" RESET, end);
+
+        int size = graph_size(graph);
+
+        printf(YELLOW "\nРазмер памяти (байты), "
+                      "требуемый для хранения графа = %d\n" RESET,
+               size);
     }
     else
         puts(VIOLET "\nГраф пустой" RESET);
@@ -300,7 +355,7 @@ static void recov_all_vertex(graph_t *graph)
     {
         for (int i = 0; i < graph->size; i++)
             recov_vertex(graph, i + 1);
-            
+
         puts(GREEN "\nУдаленные вершины были успешно восстановлены!" RESET);
     }
     else
