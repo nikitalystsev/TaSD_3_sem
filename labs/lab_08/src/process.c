@@ -8,7 +8,7 @@ static int read_menu_item(int *item)
         return ERR_MENU_ITEM;
     }
 
-    if (*item < 0 || *item > 10)
+    if (*item < 0 || *item > 5)
     {
         puts(RED "\nНеверный номер пункта меню!" RESET);
         return ERR_MENU_ITEM;
@@ -16,6 +16,7 @@ static int read_menu_item(int *item)
 
     return EXIT_SUCCESS;
 }
+
 static int read_file_name(char *file_name)
 {
     puts(TURQ "\nВведите имя файла:" RESET);
@@ -23,6 +24,19 @@ static int read_file_name(char *file_name)
     if (scanf("%s", file_name) != 1)
     {
         puts(RED "\nНевалидный ввод имени файла!" RESET);
+        return ERR_READ_DATA;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+static int read_del_number(int *number)
+{
+    puts(TURQ "\nВведите номер удаляемой вершины:" RESET);
+
+    if (scanf("%d", number) != 1)
+    {
+        puts(RED "\nНевалидный ввод номера вершины!" RESET);
         return ERR_READ_DATA;
     }
 
@@ -234,8 +248,8 @@ static int perform_a_check(graph_t *graph)
 
             int count_edges = get_count_edges(graph);
 
-            /* 
-            первое условие - проверка на связность 
+            /*
+            первое условие - проверка на связность
             второе условие - критерий дерева
             */
 
@@ -251,6 +265,46 @@ static int perform_a_check(graph_t *graph)
         puts(VIOLET "\nГраф пустой" RESET);
 
     return rc;
+}
+
+static int del_vertex(graph_t *graph)
+{
+    int rc = 0;
+
+    if (!is_empty_graph(graph))
+    {
+        int number;
+
+        if ((rc = read_del_number(&number)) != 0)
+            return rc;
+
+        if (number < 1 || number > graph->size)
+            printf(VIOLET "Вершины с номером %d нет в графе!\n", number);
+        else
+        {
+            conditional_del_vertex(graph, number);
+            printf(GREEN "Вершина с номером %d "
+                         "была успешно удалена!\n",
+                   number);
+        }
+    }
+    else
+        puts(VIOLET "\nГраф пустой" RESET);
+
+    return rc;
+}
+
+static void recov_all_vertex(graph_t *graph)
+{
+    if (!is_empty_graph(graph))
+    {
+        for (int i = 0; i < graph->size; i++)
+            recov_vertex(graph, i + 1);
+            
+        puts(GREEN "\nУдаленные вершины были успешно восстановлены!" RESET);
+    }
+    else
+        puts(VIOLET "\nГраф пустой" RESET);
 }
 
 int process(void)
@@ -286,6 +340,13 @@ int process(void)
         case 3:
             if ((rc = perform_a_check(&graph)) != 0)
                 goto free;
+            break;
+        case 4:
+            if ((rc = del_vertex(&graph)) != 0)
+                goto free;
+            break;
+        case 5:
+            recov_all_vertex(&graph);
             break;
         default:
             break;
