@@ -33,6 +33,10 @@ adj_list_t *create_node(int number);
 
 int create_graph(graph_t *graph);
 
+adj_list_t *push_end(adj_list_t *head, adj_list_t *node);
+
+void default_graph(graph_t *graph);
+
 void free_agj_list(adj_list_t *head);
 
 void free_graph(graph_t *graph);

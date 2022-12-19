@@ -22,8 +22,11 @@
 #define WHITE "\033[0;37m"
 
 #define MAX_STR_SIZE 10000
+#define DATA_DIR "./data/"
 
 #define ERR_MEM_ALLOC 100
 #define ERR_OPEN_FILE 101
+#define ERR_MENU_ITEM 102
+#define ERR_READ_DATA 103
 
 #endif
