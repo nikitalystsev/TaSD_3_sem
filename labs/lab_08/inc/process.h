@@ -6,6 +6,7 @@
 #include "graph_visual.h"
 #include "timing.h"
 #include "print.h"
+#include "gen_data.h"
 
 int process(void);
 

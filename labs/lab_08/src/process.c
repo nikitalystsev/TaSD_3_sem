@@ -141,8 +141,6 @@ static int read_graph(graph_t *graph)
             return ERR_READ_DATA;
         }
 
-        graph->data[i].degree = count_node;
-
         if ((rc = read_adj_list(file, &graph->data[i], count_node)) != 0)
         {
             fclose(file);
@@ -251,7 +249,7 @@ static int vertex_size(vertex_t *vertex)
 {
     int size = 0;
 
-    size += (2 * sizeof(vertex->number));
+    size += sizeof(vertex->number);
     size += (2 * sizeof(vertex->is_del));
     size += sizeof(adj_list_t *);
 
@@ -278,6 +276,8 @@ static int perform_a_check(graph_t *graph)
 
     if (!is_empty_graph(graph))
     {
+        bool is_can = false;
+
         beg = microseconds_now();
 
         for (int i = 0; i < graph->size; i++)
@@ -300,13 +300,17 @@ static int perform_a_check(graph_t *graph)
 
             if (count_visited == graph->size - 1 &&
                 graph->size - 1 - 1 == count_edges)
-                printf(GREEN "Можно, для этого удаляется "
-                             "вершина с номером %d\n" RESET,
-                       i + 1);
+                printf(GREEN "Можно, для этого нужно удалить "
+                             "вершину с номером %d\n" RESET,
+                       i + 1),
+                    is_can = true;
             recov_vertex(graph, i + 1);
         }
 
         end = microseconds_now() - beg;
+
+        if (!is_can)
+            puts(VIOLET "\nГраф нельзя превратить в дерево!" RESET);
 
         printf(YELLOW "\nВремя работы программы (мкс) = %LF\n" RESET, end);
 

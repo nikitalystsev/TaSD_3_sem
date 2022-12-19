@@ -28,5 +28,6 @@
 #define ERR_OPEN_FILE 101
 #define ERR_MENU_ITEM 102
 #define ERR_READ_DATA 103
+#define ERR_COUNT_DATA 104
 
 #endif
