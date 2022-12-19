@@ -49,29 +49,59 @@ void default_graph(graph_t *graph)
     }
 }
 
+// void find_vertex(graph_t *graph)
+// {
+//     for (int i = 0; i < graph->size; i++)
+//         if (!graph->data)
+    
+// }
+
 /// @brief модифицированный алгоритм поиска в глубину
 /// @param graph граф
 /// @param number вершина, с которой начинается обход
-/// @return количество пройденных вершин
-int DFS(graph_t *graph, int number)
+void DFS(graph_t *graph, int number, int *count_visited)
 {
-    int count_visited = 1;
+    (*count_visited)++;
 
-    graph->data[number - 1].is_visited = true;
+    if (!graph->data[number - 1].is_del)
+    {
+        // printf("number = %d\n", number);
+        
+        graph->data[number - 1].is_visited = true;
 
-    adj_list_t *tmp = graph->data[number - 1].head;
+        adj_list_t *tmp = graph->data[number - 1].head;
+
+        while (tmp)
+        {
+            int cur_number = tmp->number;
+
+            if (!graph->data[cur_number - 1].is_visited && !tmp->is_del)
+            {
+                DFS(graph, cur_number, count_visited);
+                // printf("count_visited = %d\n", count_visited);
+            }
+
+            tmp = tmp->next;
+        }
+    }
+    // printf("count_visited return  = %d\n", count_visited);
+}
+
+int get_real_count_node(adj_list_t *head)
+{
+    int count_node = 0;
+
+    adj_list_t *tmp = head;
 
     while (tmp)
     {
-        int cur_number = tmp->number;
-
-        if (!graph->data[cur_number - 1].is_visited)
-            count_visited += DFS(graph, cur_number);
+        if (!tmp->is_del)
+            count_node++;
 
         tmp = tmp->next;
     }
 
-    return count_visited;
+    return count_node;
 }
 
 // основана на формуле степеней графа
@@ -80,7 +110,8 @@ int get_count_edges(graph_t *graph)
     int sum_degrees = 0;
 
     for (int i = 0; i < graph->size; i++)
-        sum_degrees += graph->data[i].degree;
+        if (!graph->data[i].is_del)
+            sum_degrees += get_real_count_node(graph->data[i].head);
 
     int count_edges = sum_degrees / 2;
 
@@ -104,4 +135,7 @@ void free_graph(graph_t *graph)
         free_agj_list(graph->data[i].head);
 
     free(graph->data);
+
+    graph->data = NULL;
+    graph->size = 0;
 }

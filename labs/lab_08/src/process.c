@@ -57,8 +57,6 @@ static int read_adj_list(FILE *file, vertex_t *vertex, int count_node)
         return ERR_READ_DATA;
     }
 
-    // printf("number = %d\n", number);
-
     vertex->number = number;
 
     for (int i = 0; i < count_node; i++)
@@ -68,8 +66,6 @@ static int read_adj_list(FILE *file, vertex_t *vertex, int count_node)
             fclose(file), puts(RED "\nОшибка чтения данных из файла!" RESET);
             return ERR_READ_DATA;
         }
-
-        // printf("number in = %d\n", number);
 
         adj_list_t *node = create_node(number);
 
@@ -87,6 +83,8 @@ static int read_adj_list(FILE *file, vertex_t *vertex, int count_node)
 
 static int read_graph(graph_t *graph)
 {
+    free_graph(graph);
+
     int rc = 0;
 
     char file_name[MAX_STR_SIZE];
@@ -121,8 +119,6 @@ static int read_graph(graph_t *graph)
 
     for (int i = 0; i < graph->size; i++)
     {
-        // printf("чтение продолжается\n");
-
         int count_node;
 
         if (fscanf(file, "%d", &count_node) != 1)
@@ -133,8 +129,6 @@ static int read_graph(graph_t *graph)
 
         graph->data[i].degree = count_node;
 
-        // printf("count_node = %d\n", count_node);
-
         if ((rc = read_adj_list(file, &graph->data[i], count_node)) != 0)
         {
             fclose(file);
@@ -143,8 +137,6 @@ static int read_graph(graph_t *graph)
     }
 
     fclose(file);
-
-    // printf("конец чтения, rc = %d\n", rc);
 
     if (rc == 0)
         puts(GREEN "\nДанные были успешно прочитаны!" RESET);
@@ -175,20 +167,74 @@ static int graph_to_dot(graph_t *graph)
     return rc;
 }
 
+static void del_vertex_from_adj_list(adj_list_t *head, int number)
+{
+    adj_list_t *tmp = head;
+
+    while (tmp)
+    {
+        if (tmp->number == number)
+            tmp->is_del = true;
+
+        tmp = tmp->next;
+    }
+}
+
+static void conditional_del_vertex(graph_t *graph, int number)
+{
+    graph->data[number - 1].is_del = true;
+
+    for (int i = 0; i < graph->size; i++)
+        del_vertex_from_adj_list(graph->data[i].head, number);
+}
+
+static void recov_vertex_from_adj_list(adj_list_t *head, int number)
+{
+    adj_list_t *tmp = head;
+
+    while (tmp)
+    {
+        if (tmp->number == number)
+            tmp->is_del = false;
+
+        tmp = tmp->next;
+    }
+}
+
+static void recov_vertex(graph_t *graph, int number)
+{
+    graph->data[number - 1].is_del = false;
+
+    for (int i = 0; i < graph->size; i++)
+        recov_vertex_from_adj_list(graph->data[i].head, number);
+}
+
 static int perform_a_check(graph_t *graph)
 {
     int rc = 0;
 
-    printf("Количество вершин в графе: %d\n", graph->size);
+    if (!is_empty_graph(graph))
+    {
+        for (int i = 0; i < graph->size; i++)
+        {
+            conditional_del_vertex(graph, i + 1);
 
-    int count_visited = DFS(graph, 4);
+            int count_visited = 0;
 
-    int count_edges = get_count_edges(graph);
+            DFS(graph, 4, &count_visited);
+            int count_edges = get_count_edges(graph);
 
-    printf("Количество ребер: %d\n", count_edges);
-    
-    printf("Количество пройденных вершин: %d\n", count_visited);
-
+            if (count_visited == graph->size - 1 &&
+                graph->size - 1 - 1 == count_edges)
+                printf(GREEN "Можно, для этого удаляется "
+                             "вершина с номером %d\n" RESET,
+                       i + 1);
+            recov_vertex(graph, i + 1);
+        }
+    }
+    else
+        puts(VIOLET "\nГраф пустой" RESET);
+        
     return rc;
 }
 
