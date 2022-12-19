@@ -40,6 +40,8 @@ adj_list_t *push_end(adj_list_t *head, adj_list_t *node);
 
 void default_graph(graph_t *graph);
 
+int find_vertex_for_DFS(graph_t *graph);
+ 
 void DFS(graph_t *graph, int number, int *count_visited);
 
 int get_count_edges(graph_t *graph);

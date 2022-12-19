@@ -209,6 +209,12 @@ static void recov_vertex(graph_t *graph, int number)
         recov_vertex_from_adj_list(graph->data[i].head, number);
 }
 
+static void clean_is_visited(graph_t *graph)
+{
+    for (int i = 0; i < graph->size; i++)
+        graph->data[i].is_visited = false;
+}
+
 static int perform_a_check(graph_t *graph)
 {
     int rc = 0;
@@ -221,8 +227,17 @@ static int perform_a_check(graph_t *graph)
 
             int count_visited = 0;
 
-            DFS(graph, 4, &count_visited);
+            int number = find_vertex_for_DFS(graph);
+
+            DFS(graph, number, &count_visited);
+            clean_is_visited(graph);
+
             int count_edges = get_count_edges(graph);
+
+            /* 
+            первое условие - проверка на связность 
+            второе условие - критерий дерева
+            */
 
             if (count_visited == graph->size - 1 &&
                 graph->size - 1 - 1 == count_edges)
@@ -234,7 +249,7 @@ static int perform_a_check(graph_t *graph)
     }
     else
         puts(VIOLET "\nГраф пустой" RESET);
-        
+
     return rc;
 }
 

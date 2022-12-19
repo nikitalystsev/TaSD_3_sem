@@ -49,23 +49,26 @@ void default_graph(graph_t *graph)
     }
 }
 
-// void find_vertex(graph_t *graph)
-// {
-//     for (int i = 0; i < graph->size; i++)
-//         if (!graph->data)
-    
-// }
+int find_vertex_for_DFS(graph_t *graph)
+{
+    int number = 1;
+
+    for (int i = 0; i < graph->size; i++)
+        if (!graph->data[i].is_visited && !graph->data[i].is_del)
+            number = graph->data[i].number;
+
+    return number;
+}
 
 /// @brief модифицированный алгоритм поиска в глубину
 /// @param graph граф
 /// @param number вершина, с которой начинается обход
+/// @return через указатель число пройденных вершин
 void DFS(graph_t *graph, int number, int *count_visited)
 {
-    (*count_visited)++;
-
     if (!graph->data[number - 1].is_del)
     {
-        // printf("number = %d\n", number);
+        (*count_visited)++;
         
         graph->data[number - 1].is_visited = true;
 
@@ -74,20 +77,15 @@ void DFS(graph_t *graph, int number, int *count_visited)
         while (tmp)
         {
             int cur_number = tmp->number;
-
             if (!graph->data[cur_number - 1].is_visited && !tmp->is_del)
-            {
                 DFS(graph, cur_number, count_visited);
-                // printf("count_visited = %d\n", count_visited);
-            }
 
             tmp = tmp->next;
         }
     }
-    // printf("count_visited return  = %d\n", count_visited);
 }
 
-int get_real_count_node(adj_list_t *head)
+static int get_real_count_node(adj_list_t *head)
 {
     int count_node = 0;
 
