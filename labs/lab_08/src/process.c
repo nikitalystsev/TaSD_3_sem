@@ -37,6 +37,14 @@ static int check_node(adj_list_t *node)
     return 1;
 }
 
+static bool is_empty_graph(graph_t *graph)
+{
+    if (!graph->data && graph->size == 0)
+        return true;
+
+    return false;
+}
+
 static int read_adj_list(FILE *file, vertex_t *vertex, int count_node)
 {
     int rc = 0;
@@ -123,6 +131,8 @@ static int read_graph(graph_t *graph)
             return ERR_READ_DATA;
         }
 
+        graph->data[i].degree = count_node;
+
         // printf("count_node = %d\n", count_node);
 
         if ((rc = read_adj_list(file, &graph->data[i], count_node)) != 0)
@@ -138,6 +148,46 @@ static int read_graph(graph_t *graph)
 
     if (rc == 0)
         puts(GREEN "\nДанные были успешно прочитаны!" RESET);
+
+    return rc;
+}
+
+static int graph_to_dot(graph_t *graph)
+{
+    int rc = 0;
+
+    if (!is_empty_graph(graph))
+    {
+        char data_file[MAX_STR_SIZE] = DATA_DIR;
+        char data_gv[MAX_STR_SIZE];
+
+        if ((rc = read_file_name(data_gv)) != 0)
+            return rc;
+
+        strcat(data_file, data_gv);
+
+        if ((rc = export_graph_to_dot(data_file, "my_graph", graph)) != 0)
+            return rc;
+    }
+    else
+        puts(VIOLET "\nГраф пустой" RESET);
+
+    return rc;
+}
+
+static int perform_a_check(graph_t *graph)
+{
+    int rc = 0;
+
+    printf("Количество вершин в графе: %d\n", graph->size);
+
+    int count_visited = DFS(graph, 4);
+
+    int count_edges = get_count_edges(graph);
+
+    printf("Количество ребер: %d\n", count_edges);
+    
+    printf("Количество пройденных вершин: %d\n", count_visited);
 
     return rc;
 }
@@ -166,6 +216,14 @@ int process(void)
             break;
         case 1:
             if ((rc = read_graph(&graph)) != 0)
+                goto free;
+            break;
+        case 2:
+            if ((rc = graph_to_dot(&graph)) != 0)
+                goto free;
+            break;
+        case 3:
+            if ((rc = perform_a_check(&graph)) != 0)
                 goto free;
             break;
         default:

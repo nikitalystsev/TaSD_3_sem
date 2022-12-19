@@ -19,6 +19,7 @@ struct vertex_t
 {
     int number;       // номер вершины
     int degree;       // степень вершины
+    bool is_visited;  // пройдена ли
     adj_list_t *head; // список смежности данной вершины
 };
 
@@ -36,6 +37,10 @@ int create_graph(graph_t *graph);
 adj_list_t *push_end(adj_list_t *head, adj_list_t *node);
 
 void default_graph(graph_t *graph);
+
+int DFS(graph_t *graph, int number);
+
+int get_count_edges(graph_t *graph);
 
 void free_agj_list(adj_list_t *head);
 
