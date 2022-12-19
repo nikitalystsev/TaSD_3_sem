@@ -23,7 +23,6 @@ int create_graph(graph_t *graph)
     return EXIT_SUCCESS;
 }
 
-
 void free_agj_list(adj_list_t *head)
 {
     adj_list_t *next;
@@ -38,7 +37,7 @@ void free_agj_list(adj_list_t *head)
 void free_graph(graph_t *graph)
 {
     for (int i = 0; i < graph->size; i++)
-        free_aj_list(graph->data[i].head);
+        free_agj_list(graph->data[i].head);
     
     free(graph->data);
 }

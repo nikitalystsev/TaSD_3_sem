@@ -3,6 +3,7 @@
 
 #include "defines.h"
 #include "graph.h"
+#include "graph_visual.h"
 #include "timing.h"
 
 #endif
